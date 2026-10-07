@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { QuestionData } from '../../types/story';
+import { QuestionData, QuestionOption } from '../../types/story';
 import { LennyGuide } from '../LennyGuide';
 import { useAudioRecorder } from '../speech/useAudioRecorder';
 import { Check, Mic, MicOff, Play, RotateCcw, ArrowRight, Lightbulb, Sparkles } from 'lucide-react';
@@ -31,6 +31,10 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
   const [isFirstTryCorrect, setIsFirstTryCorrect] = useState(false);
   const [activeExpansion, setActiveExpansion] = useState<string>(questionData.fullSentenceExpansion);
   const [activeKoreanExpansion, setActiveKoreanExpansion] = useState<string>(questionData.koreanFullSentence);
+  // Randomly shuffle answer options each time question opens
+  const [shuffledOptions, setShuffledOptions] = useState<QuestionOption[]>(() =>
+    [...questionData.options].sort(() => Math.random() - 0.5)
+  );
 
   // Audio recording for [🎤 Say it]
   const {
@@ -49,8 +53,20 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
 
   const isOpinionQuestion = questionData.level === 'Your idea';
 
-  // Read out question when opening
+  // Read out question when opening and re-shuffle options
   useEffect(() => {
+    setShuffledOptions([...questionData.options].sort(() => Math.random() - 0.5));
+    setSelectedOptionId(null);
+    setIsAnswerRevealed(false);
+    setAttemptCount(0);
+    setLennyMessage(questionData.questionText);
+    setLennySubText(undefined);
+    setShowClueHint(false);
+    setIsSuccessGreenFlash(false);
+    setIsFirstTryCorrect(false);
+    setActiveExpansion(questionData.fullSentenceExpansion);
+    setActiveKoreanExpansion(questionData.koreanFullSentence);
+
     const timer = window.setTimeout(() => {
       onSpeakText(questionData.questionText);
     }, 300);
@@ -194,7 +210,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
           {isOpinionQuestion ? "Select your idea:" : "Choose the best clue answer:"}
         </p>
         <div className="grid grid-cols-1 gap-2.5">
-          {questionData.options.map((opt) => {
+          {shuffledOptions.map((opt) => {
             const isSelected = selectedOptionId === opt.id;
             const isTargetCorrect = isOpinionQuestion || opt.isCorrect;
 
