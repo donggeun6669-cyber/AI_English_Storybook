@@ -1,0 +1,6 @@
+{
+  "name": "Clue Readers: The Missing Mascot",
+  "description": "A mobile-first English mystery picture-book web app for Grade 5-6 learners with interactive speech, read-aloud, and clue-solving.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
