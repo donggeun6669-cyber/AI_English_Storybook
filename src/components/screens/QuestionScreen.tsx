@@ -29,6 +29,8 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
   const [showClueHint, setShowClueHint] = useState(false);
   const [isSuccessGreenFlash, setIsSuccessGreenFlash] = useState(false);
   const [isFirstTryCorrect, setIsFirstTryCorrect] = useState(false);
+  const [activeExpansion, setActiveExpansion] = useState<string>(questionData.fullSentenceExpansion);
+  const [activeKoreanExpansion, setActiveKoreanExpansion] = useState<string>(questionData.koreanFullSentence);
 
   // Audio recording for [🎤 Say it]
   const {
@@ -74,13 +76,19 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
         setIsFirstTryCorrect(true);
       }
 
+      const targetExpansion = chosenOption?.expansionText || questionData.fullSentenceExpansion;
+      const targetKorean = chosenOption?.koreanExpansionText || questionData.koreanFullSentence;
+
+      setActiveExpansion(targetExpansion);
+      setActiveKoreanExpansion(targetKorean);
+
       setIsSuccessGreenFlash(true);
       setIsAnswerRevealed(true);
-      setLennyMessage(questionData.fullSentenceExpansion);
+      setLennyMessage(targetExpansion);
       setLennySubText("Now practice speaking the sentence!");
 
       // Lenny expands it into full sentence and reads aloud
-      onSpeakText(questionData.fullSentenceExpansion);
+      onSpeakText(targetExpansion);
     } else {
       // Never a red X!
       setIsSuccessGreenFlash(false);
@@ -97,9 +105,15 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
         if (correctOpt) {
           setSelectedOptionId(correctOpt.id);
         }
-        setLennyMessage(questionData.fullSentenceExpansion);
+        const targetExpansion = correctOpt?.expansionText || questionData.fullSentenceExpansion;
+        const targetKorean = correctOpt?.koreanExpansionText || questionData.koreanFullSentence;
+
+        setActiveExpansion(targetExpansion);
+        setActiveKoreanExpansion(targetKorean);
+
+        setLennyMessage(targetExpansion);
         setLennySubText("Here is the answer! Let's practice saying it together.");
-        onSpeakText(questionData.fullSentenceExpansion);
+        onSpeakText(targetExpansion);
       }
     }
   };
@@ -237,7 +251,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
             </div>
             <button
               type="button"
-              onClick={() => onSpeakText(questionData.fullSentenceExpansion)}
+              onClick={() => onSpeakText(activeExpansion)}
               className="text-xs font-bold text-amber-700 hover:text-amber-900 underline"
             >
               Hear Lenny 🔊
@@ -247,10 +261,10 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
           {/* Full Sentence Display */}
           <div className="p-2.5 bg-white rounded-xl border border-amber-200 shadow-inner">
             <p className="text-base font-extrabold text-slate-900 leading-snug">
-              "{questionData.fullSentenceExpansion}"
+              "{activeExpansion}"
             </p>
             <p className="text-xs font-medium text-slate-500 mt-1">
-              {questionData.koreanFullSentence}
+              {activeKoreanExpansion}
             </p>
           </div>
 

@@ -425,8 +425,22 @@ export const QUESTIONS_DATA: Record<number, QuestionData> = {
     questionText: "What should Minji and Jun do now?",
     hintText: "Both choices are great detective decisions!",
     options: [
-      { id: "a", text: "Ask Teacher Kim for help", emoji: "👩‍🏫", isCorrect: true },
-      { id: "b", text: "Offer a shiny ribbon to the bird", emoji: "🎀", isCorrect: true }
+      {
+        id: "a",
+        text: "Ask Teacher Kim for help",
+        emoji: "👩‍🏫",
+        isCorrect: true,
+        expansionText: "I think they should ask Teacher Kim for help.",
+        koreanExpansionText: "선생님께 도움을 요청해야 한다고 생각해요."
+      },
+      {
+        id: "b",
+        text: "Offer a shiny ribbon to the bird",
+        emoji: "🎀",
+        isCorrect: true,
+        expansionText: "I think they should offer a shiny ribbon to the bird.",
+        koreanExpansionText: "새에게 반짝이는 리본을 주어야 한다고 생각해요."
+      }
     ],
     fullSentenceExpansion: "Great idea! Working with friends and teachers is smart!",
     koreanFullSentence: "좋은 생각이에요! 친구와 선생님께 도움을 청하는 건 현명해요!"
@@ -451,8 +465,22 @@ export const QUESTIONS_DATA: Record<number, QuestionData> = {
     questionText: "How does the magpie feel about Sports Day?",
     hintText: "Share your detective opinion!",
     options: [
-      { id: "a", text: "Happy to watch from the tree", emoji: "🎉", isCorrect: true },
-      { id: "b", text: "Proud to have friendly students", emoji: "✨", isCorrect: true }
+      {
+        id: "a",
+        text: "Happy to watch from the tree",
+        emoji: "🎉",
+        isCorrect: true,
+        expansionText: "I think the magpie is happy to watch from the tree.",
+        koreanExpansionText: "까치가 나무에서 구경하며 기뻐한다고 생각해요."
+      },
+      {
+        id: "b",
+        text: "Proud to have friendly students",
+        emoji: "✨",
+        isCorrect: true,
+        expansionText: "I think the magpie is proud to have friendly students.",
+        koreanExpansionText: "까치가 다정한 친구들이 생겨 자랑스러워한다고 생각해요."
+      }
     ],
     fullSentenceExpansion: "Wonderful idea! Everyone is smiling together today!",
     koreanFullSentence: "멋진 생각이에요! 오늘 모두가 함께 활짝 웃고 있어요!"
@@ -471,28 +499,28 @@ export const CASE_CLOSED_CARDS: StoryOrderCard[] = [
   {
     id: 1,
     stepNumber: 1,
-    title: "1. Empty Box",
+    title: "Empty Box",
     description: "Tigi the tiger mascot disappears from the classroom box.",
     emoji: "📦"
   },
   {
     id: 2,
     stepNumber: 2,
-    title: "2. Finding Clues",
+    title: "Finding Clues",
     description: "Minji and Jun spot feathers, bird tracks, and a shiny button.",
     emoji: "🔍"
   },
   {
     id: 3,
     stepNumber: 3,
-    title: "3. The Magpie's Nest",
+    title: "The Magpie's Nest",
     description: "They discover Tigi sitting safely in a big tree nest.",
     emoji: "🪺"
   },
   {
     id: 4,
     stepNumber: 4,
-    title: "4. Sports Day Cheer",
+    title: "Sports Day Cheer",
     description: "Teacher Kim rescues Tigi and the whole class cheers!",
     emoji: "🏅"
   }

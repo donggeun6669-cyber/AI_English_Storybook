@@ -26,6 +26,16 @@ interface CaseClosedScreenProps {
   onSpeakText: (text: string) => void;
 }
 
+// Randomly shuffle cards ensuring they are never initially in the correct order [1, 2, 3, 4]
+const getShuffledCards = (): StoryOrderCard[] => {
+  const cards = [...CASE_CLOSED_CARDS];
+  let shuffled: StoryOrderCard[] = [];
+  do {
+    shuffled = [...cards].sort(() => Math.random() - 0.5);
+  } while (shuffled.every((c, idx) => c.stepNumber === idx + 1));
+  return shuffled;
+};
+
 export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
   coverGuess,
   cluesFoundScore,
@@ -35,9 +45,11 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
   onSpeakText
 }) => {
   // Top Half: 4 cards sequencing state
-  // User selects cards in order 1, 2, 3, 4
+  const [shuffledCards, setShuffledCards] = useState<StoryOrderCard[]>(() => getShuffledCards());
   const [selectedCardIds, setSelectedCardIds] = useState<number[]>([]);
   const [isSequenceCorrect, setIsSequenceCorrect] = useState(false);
+  const [shakingCardId, setShakingCardId] = useState<number | null>(null);
+  const [lennyCardAdvice, setLennyCardAdvice] = useState<string | null>(null);
 
   // Bottom Half: Sentence Chips Builder
   const [selectedSlot1, setSelectedSlot1] = useState<string | null>(null);
@@ -78,32 +90,41 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
   }, [isAllCompleted]);
 
   // Handle card tap for sequencing
-  const handleCardTap = (cardId: number) => {
+  const handleCardTap = (card: StoryOrderCard) => {
     if (isSequenceCorrect) return;
 
-    if (selectedCardIds.includes(cardId)) {
-      // Remove card
-      setSelectedCardIds(selectedCardIds.filter((id) => id !== cardId));
-    } else {
-      const nextSequence = [...selectedCardIds, cardId];
+    // Already tapped and accepted
+    if (selectedCardIds.includes(card.id)) return;
+
+    const nextExpectedStep = selectedCardIds.length + 1;
+
+    if (card.stepNumber === nextExpectedStep) {
+      // Correct next step!
+      const nextSequence = [...selectedCardIds, card.id];
       setSelectedCardIds(nextSequence);
+      setLennyCardAdvice(null);
 
       if (nextSequence.length === 4) {
-        // Check if [1, 2, 3, 4]
-        const isRight = nextSequence.every((val, index) => val === index + 1);
-        if (isRight) {
-          setIsSequenceCorrect(true);
-          onSpeakText("Great job! The story is in the right order!");
-        } else {
-          onSpeakText("Almost! Look at which happened first.");
-        }
+        setIsSequenceCorrect(true);
+        onSpeakText("Great job! The story is in the right order!");
       }
+    } else {
+      // Not the next correct event: Lenny guides, card shakes gently, no red X, tap not accepted
+      setLennyCardAdvice("Hmm, what happened before that?");
+      onSpeakText("Hmm, what happened before that?");
+      setShakingCardId(card.id);
+      setTimeout(() => {
+        setShakingCardId(null);
+      }, 500);
     }
   };
 
   const handleResetCards = () => {
     setSelectedCardIds([]);
     setIsSequenceCorrect(false);
+    setShakingCardId(null);
+    setLennyCardAdvice(null);
+    setShuffledCards(getShuffledCards());
   };
 
   // Full built sentence
@@ -148,25 +169,36 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
             <button
               type="button"
               onClick={handleResetCards}
-              className="text-[11px] font-bold text-slate-500 hover:text-slate-800 flex items-center gap-0.5"
+              className="text-[11px] font-bold text-slate-500 hover:text-slate-800 flex items-center gap-0.5 cursor-pointer"
             >
               <RotateCcw className="w-3 h-3" /> Reset
             </button>
           )}
         </div>
 
+        {/* Lenny gentle guidance on wrong card tap */}
+        {lennyCardAdvice && !isSequenceCorrect && (
+          <div className="flex items-center gap-2 p-2 bg-amber-50 border border-amber-300 rounded-xl text-xs text-amber-900 font-semibold animate-in fade-in">
+            <span className="text-base">🔍</span>
+            <span>Lenny: "{lennyCardAdvice}"</span>
+          </div>
+        )}
+
         {/* 4 Cards Grid */}
         <div className="grid grid-cols-2 gap-2">
-          {CASE_CLOSED_CARDS.map((card) => {
+          {shuffledCards.map((card) => {
             const orderIndex = selectedCardIds.indexOf(card.id);
             const isSelected = orderIndex !== -1;
+            const isShaking = shakingCardId === card.id;
 
             return (
               <button
                 key={card.id}
                 type="button"
-                onClick={() => handleCardTap(card.id)}
+                onClick={() => handleCardTap(card)}
                 className={`min-h-[80px] p-2.5 rounded-xl border-2 text-left transition-all active:scale-95 flex flex-col justify-between ${
+                  isShaking ? 'animate-shake' : ''
+                } ${
                   isSequenceCorrect
                     ? 'bg-emerald-50 border-emerald-400 text-emerald-950 shadow-xs'
                     : isSelected
@@ -176,9 +208,10 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
               >
                 <div className="flex items-center justify-between w-full">
                   <span className="text-2xl">{card.emoji}</span>
+                  {/* Order badge is only shown AFTER card is tapped and accepted */}
                   {isSelected && (
                     <span className="w-6 h-6 rounded-full bg-amber-500 text-white font-extrabold text-xs flex items-center justify-center shadow-xs">
-                      #{orderIndex + 1}
+                      {orderIndex + 1}
                     </span>
                   )}
                 </div>
@@ -195,9 +228,7 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
 
         {selectedCardIds.length > 0 && !isSequenceCorrect && (
           <p className="text-[11px] font-medium text-amber-800 text-center">
-            {selectedCardIds.length < 4
-              ? `Selected: ${selectedCardIds.length} / 4 cards`
-              : "Not quite right yet — tap Reset to try again!"}
+            {`Ordered: ${selectedCardIds.length} / 4 cards`}
           </p>
         )}
       </div>

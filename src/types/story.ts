@@ -26,6 +26,8 @@ export interface QuestionOption {
   text: string;
   emoji: string;
   isCorrect?: boolean; // For 'Your idea', any choice can be accepted
+  expansionText?: string;
+  koreanExpansionText?: string;
 }
 
 export interface QuestionData {
