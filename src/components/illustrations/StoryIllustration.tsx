@@ -11,6 +11,31 @@ export const StoryIllustration: React.FC<StoryIllustrationProps> = ({
   className = '',
   highlightClue = false
 }) => {
+  // Stitch illustrations (Google Stitch, 2026-10-11). Falls back to the SVG scene if a picture is missing.
+  const imageSrc =
+    sceneId === 'cover'
+      ? '/images/cover.jpg'
+      : /^scene-(\d+)$/.test(sceneId)
+      ? `/images/p${sceneId.replace('scene-', '').padStart(2, '0')}.jpg`
+      : null;
+
+  if (imageSrc) {
+    return (
+      <div
+        className={`relative w-full aspect-[4/3] rounded-[24px] overflow-hidden bg-[#FCE9DA] shadow-sm ${
+          highlightClue ? 'ring-4 ring-[#FFD13B] ring-offset-2 animate-pulse' : ''
+        } ${className}`}
+      >
+        <img
+          src={imageSrc}
+          alt=""
+          className="w-full h-full object-cover select-none"
+          draggable={false}
+        />
+      </div>
+    );
+  }
+
   return (
     <div
       className={`relative w-full aspect-[16/10] sm:aspect-[16/11] bg-sky-100 rounded-2xl overflow-hidden border-2 border-amber-200 shadow-sm ${

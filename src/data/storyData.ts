@@ -491,6 +491,7 @@ export const QUESTIONS_DATA: Record<number, QuestionData> = {
 
 export interface StoryOrderCard {
   id: number;
+  image?: string;
   stepNumber: number; // 1, 2, 3, 4
   title: string;
   description: string;
@@ -500,6 +501,7 @@ export interface StoryOrderCard {
 export const CASE_CLOSED_CARDS: StoryOrderCard[] = [
   {
     id: 1,
+    image: "/images/p02.jpg",
     stepNumber: 1,
     title: "Empty Box",
     description: "Tigi the tiger mascot disappears from the classroom box.",
@@ -507,6 +509,7 @@ export const CASE_CLOSED_CARDS: StoryOrderCard[] = [
   },
   {
     id: 2,
+    image: "/images/p06.jpg",
     stepNumber: 2,
     title: "Finding Clues",
     description: "Minji and Jun find feathers, bird footprints, and a shiny button.",
@@ -514,6 +517,7 @@ export const CASE_CLOSED_CARDS: StoryOrderCard[] = [
   },
   {
     id: 3,
+    image: "/images/p10.jpg",
     stepNumber: 3,
     title: "The Magpie's Nest",
     description: "They discover Tigi sitting safely in a big tree nest.",
@@ -521,6 +525,7 @@ export const CASE_CLOSED_CARDS: StoryOrderCard[] = [
   },
   {
     id: 4,
+    image: "/images/p12.jpg",
     stepNumber: 4,
     title: "Sports Day Cheer",
     description: "Teacher Kim rescues Tigi and the whole class cheers!",

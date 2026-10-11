@@ -266,8 +266,16 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
                     : 'bg-[#FDF3EA]/60 hover:bg-[#FDF3EA] text-[#2D241E]'
                 }`}
               >
+                {card.image && (
+                  <img
+                    src={card.image}
+                    alt=""
+                    className="w-full aspect-[4/3] object-cover rounded-[16px] mb-1.5 select-none"
+                    draggable={false}
+                  />
+                )}
                 <div className="flex items-center justify-between w-full">
-                  <span className="text-2xl">{card.emoji}</span>
+                  {!card.image && <span className="text-2xl">{card.emoji}</span>}
                   {isSelected && (
                     <div className="w-6 h-6 rounded-full bg-[#4CAF50] text-white font-extrabold text-xs flex items-center justify-center shadow-xs">
                       {isSequenceCorrect ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : orderIndex + 1}

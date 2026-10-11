@@ -90,63 +90,12 @@ export const LennyGuide: React.FC<LennyGuideProps> = ({
     <div className={`flex items-start gap-3 ${className}`}>
       {/* Animated Lenny SVG */}
       <div className={`relative shrink-0 ${dimensionClass} ${mood === 'happy' ? 'animate-bounce' : 'animate-bounce-slow'}`}>
-        <svg viewBox="0 0 120 120" className="w-full h-full drop-shadow-md">
-          {/* Glass Rim Shadow */}
-          <circle cx="56" cy="54" r="39" fill="#000000" opacity="0.08" />
-
-          {/* Wooden / Brass Handle */}
-          <path
-            d="M 83 80 L 108 105 A 7 7 0 0 1 98 115 L 73 90 Z"
-            fill="#d97706"
-            stroke="#b45309"
-            strokeWidth="3.5"
-            strokeLinejoin="round"
-          />
-          {/* Handle Grip Stripes */}
-          <path d="M 88 95 L 94 89" stroke="#fef3c7" strokeWidth="2.5" strokeLinecap="round" />
-          <path d="M 94 101 L 100 95" stroke="#fef3c7" strokeWidth="2.5" strokeLinecap="round" />
-
-          {/* Shiny Metallic Lens Frame */}
-          <circle cx="56" cy="52" r="38" fill="#38bdf8" stroke="#0284c7" strokeWidth="6" />
-
-          {/* Glass Lens Interior */}
-          <circle cx="56" cy="52" r="32" fill="#e0f2fe" />
-
-          {/* Glass Highlight Gleam */}
-          <path
-            d="M 34 38 A 24 24 0 0 1 76 34"
-            stroke="#ffffff"
-            strokeWidth="4"
-            strokeLinecap="round"
-            opacity="0.85"
-            fill="none"
-          />
-          <path
-            d="M 32 46 A 24 24 0 0 0 40 68"
-            stroke="#ffffff"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            opacity="0.6"
-            fill="none"
-          />
-
-          {/* Detective Cap */}
-          <path
-            d="M 32 26 Q 56 12 80 26 C 85 27 75 22 56 22 C 37 22 27 27 32 26 Z"
-            fill="#854d0e"
-          />
-          <path
-            d="M 34 26 C 36 10 76 10 78 26 Z"
-            fill="#a16207"
-            stroke="#713f12"
-            strokeWidth="2"
-          />
-          {/* Little Detective Ribbon */}
-          <rect x="42" y="22" width="28" height="4" rx="2" fill="#ca8a04" />
-
-          {/* Lenny's Cute Expressive Face */}
-          {getLennyFace()}
-        </svg>
+        <img
+          src="/images/lenny.jpg"
+          alt="Lenny"
+          className="w-full h-full rounded-full object-cover drop-shadow-md select-none"
+          draggable={false}
+        />
 
         {/* Small detective badge badge pin */}
         <div className="absolute -bottom-1 -right-1 bg-amber-400 text-amber-950 font-bold text-[9px] px-1 py-0.5 rounded-full border border-amber-600 shadow-xs flex items-center gap-0.5">
