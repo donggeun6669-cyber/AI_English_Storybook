@@ -2,11 +2,22 @@
 
 @layer base {
   body {
-    font-family: 'Nunito', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Nunito Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: #2D241E;
+    background-color: #FDF3EA;
   }
-  h1, h2, h3, h4, button, .font-display {
-    font-family: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  h1, h2, h3, h4, h5, h6, button, .font-display {
+    font-family: 'Nunito Sans', system-ui, -apple-system, sans-serif;
   }
+}
+
+.btn-3d-orange {
+  box-shadow: 0 4px 0 #D9731E;
+  transition: all 0.15s ease-in-out;
+}
+.btn-3d-orange:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #D9731E;
 }
 
 @keyframes bounceSlow {

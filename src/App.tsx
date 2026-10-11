@@ -124,15 +124,15 @@ export default function App() {
   const currentQuestionData = QUESTIONS_DATA[currentPage] || QUESTIONS_DATA[1];
 
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-0 sm:p-4 selection:bg-amber-200">
+    <div className="min-h-screen bg-[#2D241E] flex items-center justify-center p-0 sm:p-4 selection:bg-[#FFD13B]">
       {/* Centered Portrait Phone Mockup Layout (max-width 480px) */}
-      <main className="w-full max-w-[480px] h-[100dvh] sm:h-[844px] bg-amber-50 sm:rounded-[36px] shadow-2xl flex flex-col overflow-hidden border-0 sm:border-8 sm:border-slate-800 relative">
+      <main className="w-full max-w-[480px] h-[100dvh] sm:h-[844px] bg-[#FDF3EA] sm:rounded-[36px] shadow-2xl flex flex-col overflow-hidden border-0 sm:border-8 sm:border-[#3E322A] relative text-[#2D241E]">
         
         {/* Subtle decorative phone notch bar for mobile aesthetic */}
-        <div className="hidden sm:flex justify-center pt-2 pb-1">
-          <div className="w-28 h-3.5 bg-slate-800 rounded-full flex items-center justify-center">
-            <div className="w-2.5 h-2.5 bg-slate-900 rounded-full mr-2" />
-            <div className="w-1.5 h-1.5 bg-blue-900/60 rounded-full" />
+        <div className="hidden sm:flex justify-center pt-2 pb-1 bg-transparent">
+          <div className="w-28 h-3.5 bg-[#3E322A] rounded-full flex items-center justify-center">
+            <div className="w-2.5 h-2.5 bg-[#2D241E] rounded-full mr-2" />
+            <div className="w-1.5 h-1.5 bg-[#FF9436]/40 rounded-full" />
           </div>
         </div>
 

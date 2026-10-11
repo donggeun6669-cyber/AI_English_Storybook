@@ -156,19 +156,19 @@ export const LennyGuide: React.FC<LennyGuideProps> = ({
 
       {/* Lenny's Speech Bubble */}
       {speechText && (
-        <div className="relative flex-1 bg-white border-2 border-amber-300 rounded-2xl p-3 shadow-md text-slate-800">
+        <div className="relative flex-1 bg-white rounded-[20px] p-3 shadow-xs text-[#2D241E] border border-[#FCE9DA]">
           {/* Bubble beak pointing left */}
-          <div className="absolute -left-2 top-4 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-8 border-r-amber-300" />
+          <div className="absolute -left-2 top-4 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-8 border-r-[#FCE9DA]" />
           <div className="absolute -left-1.5 top-4 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-8 border-r-white" />
 
           <div className="flex items-start justify-between gap-2">
             <div>
               <div className="flex items-center gap-1.5 mb-0.5">
-                <span className="font-bold text-sm uppercase tracking-wider text-amber-800">Lenny</span>
-                <span className="text-sm text-slate-500">· Detective Guide</span>
+                <span className="font-extrabold text-xs uppercase tracking-wider text-[#8A4B14]">Lenny</span>
+                <span className="text-xs text-[#2D241E]/60 font-semibold">· Detective Guide</span>
               </div>
-              <p className="text-base font-semibold leading-snug text-slate-900">{speechText}</p>
-              {subText && <p className="text-sm text-slate-600 mt-1 font-medium">{subText}</p>}
+              <p className="text-base font-extrabold leading-snug text-[#2D241E]">{speechText}</p>
+              {subText && <p className="text-xs text-[#2D241E]/70 mt-1 font-bold">{subText}</p>}
             </div>
 
             {onSpeak && (
@@ -176,7 +176,7 @@ export const LennyGuide: React.FC<LennyGuideProps> = ({
                 type="button"
                 onClick={onSpeak}
                 aria-label="Listen to Lenny"
-                className="shrink-0 p-2 text-amber-700 hover:text-amber-900 bg-amber-50 active:bg-amber-100 rounded-xl transition border border-amber-200"
+                className="shrink-0 p-1.5 text-[#8A4B14] hover:text-[#2D241E] bg-[#FCE9DA] hover:bg-[#F5DAC4] active:bg-[#FCE9DA] rounded-full transition cursor-pointer"
               >
                 <Volume2 className="w-4 h-4" />
               </button>

@@ -5,6 +5,7 @@ import { CASE_CLOSED_CARDS, SENTENCE_BUILDER_DATA, StoryOrderCard } from '../../
 import { useAudioRecorder } from '../speech/useAudioRecorder';
 import { useSpeechRecognition } from '../speech/useSpeechRecognition';
 import {
+  Check,
   CheckCircle2,
   Mic,
   MicOff,
@@ -192,51 +193,58 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full min-h-[620px] justify-between p-3.5 space-y-4 pb-6 overflow-y-auto">
+    <div className="flex flex-col h-full min-h-[620px] justify-between p-3.5 space-y-4 pb-6 overflow-y-auto text-[#2D241E]">
       {/* Top Title Banner */}
-      <div className="text-center pt-1">
-        <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-100 text-amber-900 text-sm font-bold uppercase shadow-xs mb-1">
-          <Trophy className="w-4 h-4 text-amber-600" />
+      <div className="text-center pt-0.5">
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#FFD13B] text-[#2D241E] text-xs font-extrabold uppercase shadow-xs mb-1">
+          <Trophy className="w-3.5 h-3.5 text-[#8A4B14]" />
           <span>Case Conclusion · 최종 수사</span>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-display">
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-[#2D241E] tracking-tight">
           Case Closed! 🔍
         </h2>
-        <p className="text-sm font-semibold text-slate-600">
+        <p className="text-xs sm:text-sm font-bold text-[#8A4B14]">
           Put the story in order and build your detective report.
         </p>
       </div>
 
-      {/* SECTION 1: 4 Story Cards Sequencing */}
-      <div className="bg-white rounded-2xl p-3.5 border-2 border-amber-200 shadow-xs space-y-2.5">
+      {/* SECTION 1: 4 Story Cards Sequencing in a 2x2 Grid */}
+      <div className="bg-white rounded-[24px] p-3.5 shadow-sm space-y-2.5">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-sm font-extrabold text-amber-950 uppercase">
+          <div className="flex items-center gap-1.5 text-xs sm:text-sm font-extrabold text-[#2D241E] uppercase">
             <span>1. Story Timeline (Tap in order 1 → 4)</span>
           </div>
           {isSequenceCorrect ? (
-            <span className="text-sm font-bold text-emerald-700 flex items-center gap-1">
-              <CheckCircle2 className="w-4 h-4" /> Ordered!
+            <span className="px-3 py-1 rounded-full bg-[#4CAF50] text-white text-xs font-extrabold shadow-xs flex items-center gap-1">
+              <CheckCircle2 className="w-3.5 h-3.5" /> 4 / 4 Completed
             </span>
           ) : (
-            <button
-              type="button"
-              onClick={handleResetCards}
-              className="text-sm font-bold text-slate-600 hover:text-slate-900 flex items-center gap-0.5 cursor-pointer"
-            >
-              <RotateCcw className="w-4 h-4" /> Reset
-            </button>
+            <div className="flex items-center gap-2">
+              {selectedCardIds.length > 0 && (
+                <span className="px-2.5 py-0.5 rounded-full bg-[#FCE9DA] text-[#8A4B14] text-xs font-extrabold">
+                  {selectedCardIds.length} / 4 Completed
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={handleResetCards}
+                className="text-xs font-extrabold text-[#8A4B14] hover:text-[#2D241E] flex items-center gap-0.5 cursor-pointer"
+              >
+                <RotateCcw className="w-3.5 h-3.5" /> Reset
+              </button>
+            </div>
           )}
         </div>
 
         {/* Lenny guidance on card sequencing */}
         {lennyCardAdvice && !isSequenceCorrect && (
-          <div className="flex items-center gap-2 p-2.5 bg-amber-50 border border-amber-300 rounded-xl text-sm text-amber-900 font-semibold animate-in fade-in">
-            <span className="text-lg">🔍</span>
+          <div className="flex items-center gap-2 p-2.5 bg-[#FCE9DA] rounded-[18px] text-xs sm:text-sm text-[#8A4B14] font-bold animate-in fade-in">
+            <span className="text-base">🔍</span>
             <span>Lenny: "{lennyCardAdvice}"</span>
           </div>
         )}
 
-        {/* 4 Cards Grid */}
+        {/* 2x2 Cards Grid of rounded white cards */}
         <div className="grid grid-cols-2 gap-2">
           {shuffledCards.map((card) => {
             const orderIndex = selectedCardIds.indexOf(card.id);
@@ -248,27 +256,27 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
                 key={card.id}
                 type="button"
                 onClick={() => handleCardTap(card)}
-                className={`min-h-[85px] p-2.5 rounded-xl border-2 text-left transition-all active:scale-95 flex flex-col justify-between cursor-pointer ${
+                className={`min-h-[88px] p-2.5 rounded-[24px] text-left transition-all active:scale-95 flex flex-col justify-between cursor-pointer relative shadow-xs ${
                   isShaking ? 'animate-shake' : ''
                 } ${
                   isSequenceCorrect
-                    ? 'bg-emerald-50 border-emerald-400 text-emerald-950 shadow-xs'
+                    ? 'bg-green-50/90 border-2 border-[#4CAF50] text-[#2D241E]'
                     : isSelected
-                    ? 'bg-amber-100 border-amber-500 text-amber-950 shadow-sm'
-                    : 'bg-slate-50 border-slate-200 hover:border-amber-300 text-slate-800'
+                    ? 'bg-[#FFD13B]/40 ring-2 ring-[#FFD13B] text-[#2D241E]'
+                    : 'bg-[#FDF3EA]/60 hover:bg-[#FDF3EA] text-[#2D241E]'
                 }`}
               >
                 <div className="flex items-center justify-between w-full">
                   <span className="text-2xl">{card.emoji}</span>
                   {isSelected && (
-                    <span className="w-6 h-6 rounded-full bg-amber-500 text-white font-extrabold text-sm flex items-center justify-center shadow-xs">
-                      {orderIndex + 1}
-                    </span>
+                    <div className="w-6 h-6 rounded-full bg-[#4CAF50] text-white font-extrabold text-xs flex items-center justify-center shadow-xs">
+                      {isSequenceCorrect ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : orderIndex + 1}
+                    </div>
                   )}
                 </div>
                 <div className="mt-1">
-                  <p className="text-sm font-bold leading-tight line-clamp-1">{card.title}</p>
-                  <p className="text-sm text-slate-600 leading-tight line-clamp-2 mt-0.5">
+                  <p className="text-xs sm:text-sm font-extrabold leading-tight line-clamp-1">{card.title}</p>
+                  <p className="text-[11px] font-semibold text-[#2D241E]/70 leading-tight line-clamp-2 mt-0.5">
                     {card.description}
                   </p>
                 </div>
@@ -276,25 +284,19 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
             );
           })}
         </div>
-
-        {selectedCardIds.length > 0 && !isSequenceCorrect && (
-          <p className="text-sm font-medium text-amber-900 text-center">
-            {`Ordered: ${selectedCardIds.length} / 4 cards`}
-          </p>
-        )}
       </div>
 
-      {/* SECTION 2: Sentence Builder & Speech */}
-      <div className="bg-white rounded-2xl p-3.5 border-2 border-amber-200 shadow-xs space-y-3">
+      {/* SECTION 2: "Lenny's Detective Deduction" card with yellow & green pills */}
+      <div className="bg-white rounded-[24px] p-3.5 shadow-sm space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-extrabold text-amber-950 uppercase">
-            2. Detective Conclusion Sentence
+          <span className="text-xs sm:text-sm font-extrabold text-[#2D241E] uppercase">
+            Lenny's Detective Deduction
           </span>
           {isSentenceCorrect && (
             <button
               type="button"
               onClick={() => onSpeakText(finalSentence)}
-              className="text-sm font-bold text-amber-800 hover:text-amber-950 underline cursor-pointer"
+              className="text-xs font-extrabold text-[#8A4B14] hover:text-[#2D241E] underline cursor-pointer"
             >
               Listen 🔊
             </button>
@@ -303,28 +305,40 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
 
         {/* Lenny guidance for sentence builder */}
         {lennySentenceAdvice && !isSentenceCorrect && (
-          <div className="flex items-center gap-2 p-2.5 bg-amber-50 border border-amber-300 rounded-xl text-sm text-amber-900 font-semibold animate-in fade-in">
-            <span className="text-lg">🔍</span>
+          <div className="flex items-center gap-2 p-2.5 bg-[#FCE9DA] rounded-[18px] text-xs sm:text-sm text-[#8A4B14] font-bold animate-in fade-in">
+            <span className="text-base">🔍</span>
             <span>Lenny: "{lennySentenceAdvice}"</span>
           </div>
         )}
 
-        {/* Sentence Display Area */}
-        <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-base font-extrabold text-slate-900 leading-relaxed shadow-inner">
-          "I think the{' '}
-          <span className="underline decoration-amber-500 decoration-3 font-black text-amber-950">
-            {slot1Text}
-          </span>{' '}
+        {/* Deduction Sentence Area with yellow & green pills */}
+        <div className="p-3.5 bg-[#FDF3EA] rounded-[20px] text-base font-extrabold text-[#2D241E] leading-relaxed shadow-inner">
+          I think the{' '}
+          {selectedSlot1 ? (
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#FFD13B] text-[#2D241E] font-extrabold text-sm mx-1 shadow-xs">
+              {slot1Text}
+            </span>
+          ) : (
+            <span className="inline-block px-3 py-1 rounded-full bg-white/80 border border-dashed border-[#8A4B14] text-[#8A4B14] text-xs font-bold mx-1">
+              [who?]
+            </span>
+          )}{' '}
           took the mascot because{' '}
-          <span className="underline decoration-amber-500 decoration-3 font-black text-amber-950">
-            {slot2Text}
-          </span>
-          ."
+          {selectedSlot2 ? (
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#4CAF50] text-white font-extrabold text-sm mx-1 shadow-xs">
+              {slot2Text}
+            </span>
+          ) : (
+            <span className="inline-block px-3 py-1 rounded-full bg-white/80 border border-dashed border-[#8A4B14] text-[#8A4B14] text-xs font-bold mx-1">
+              [why?]
+            </span>
+          )}
+          .
         </div>
 
-        {/* Slot 1 Chips: Who */}
+        {/* Slot 1 Chips: Who (Culprit) */}
         <div className="space-y-1.5">
-          <span className="text-sm font-bold text-slate-600 uppercase">Who took it?</span>
+          <span className="text-xs font-extrabold text-[#8A4B14] uppercase">Who took it?</span>
           <div className="flex flex-wrap gap-2">
             {SENTENCE_BUILDER_DATA.slot1.map((item) => {
               const isSelected = selectedSlot1 === item.id;
@@ -336,17 +350,17 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
                   key={item.id}
                   type="button"
                   onClick={() => handleSlot1Click(item.id)}
-                  className={`min-h-[46px] px-3.5 py-2 rounded-xl text-sm font-bold border transition active:scale-95 flex items-center gap-1.5 cursor-pointer ${
+                  className={`min-h-[44px] px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-extrabold transition active:scale-95 flex items-center gap-1.5 cursor-pointer shadow-xs ${
                     isWobbling ? 'animate-shake' : ''
                   } ${
-                    shouldGlow ? 'ring-4 ring-amber-400 bg-amber-100 border-amber-500 animate-pulse' : ''
+                    shouldGlow ? 'ring-4 ring-[#FFD13B] bg-[#FFD13B]/60' : ''
                   } ${
                     isSelected
-                      ? 'bg-amber-500 text-white border-amber-600 shadow-xs'
-                      : 'bg-slate-100 text-slate-800 border-slate-300 hover:bg-amber-50'
+                      ? 'bg-[#FFD13B] text-[#2D241E] ring-2 ring-[#FF9436]'
+                      : 'bg-[#FDF3EA] hover:bg-[#FCE9DA] text-[#2D241E]'
                   }`}
                 >
-                  <span className="text-lg">{item.emoji}</span>
+                  <span className="text-base">{item.emoji}</span>
                   <span>{item.text}</span>
                 </button>
               );
@@ -354,9 +368,9 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
           </div>
         </div>
 
-        {/* Slot 2 Chips: Why */}
+        {/* Slot 2 Chips: Why (Reason) */}
         <div className="space-y-1.5">
-          <span className="text-sm font-bold text-slate-600 uppercase">Why did it take it?</span>
+          <span className="text-xs font-extrabold text-[#8A4B14] uppercase">Why did it take it?</span>
           <div className="flex flex-wrap gap-2">
             {SENTENCE_BUILDER_DATA.slot2.map((item) => {
               const isSelected = selectedSlot2 === item.id;
@@ -368,17 +382,17 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
                   key={item.id}
                   type="button"
                   onClick={() => handleSlot2Click(item.id)}
-                  className={`min-h-[46px] px-3.5 py-2 rounded-xl text-sm font-bold border transition active:scale-95 flex items-center gap-1.5 cursor-pointer ${
+                  className={`min-h-[44px] px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-extrabold transition active:scale-95 flex items-center gap-1.5 cursor-pointer shadow-xs ${
                     isWobbling ? 'animate-shake' : ''
                   } ${
-                    shouldGlow ? 'ring-4 ring-amber-400 bg-amber-100 border-amber-500 animate-pulse' : ''
+                    shouldGlow ? 'ring-4 ring-[#FFD13B] bg-[#FFD13B]/60' : ''
                   } ${
                     isSelected
-                      ? 'bg-amber-500 text-white border-amber-600 shadow-xs'
-                      : 'bg-slate-100 text-slate-800 border-slate-300 hover:bg-amber-50'
+                      ? 'bg-[#4CAF50] text-white ring-2 ring-[#4CAF50]/40'
+                      : 'bg-[#FDF3EA] hover:bg-[#FCE9DA] text-[#2D241E]'
                   }`}
                 >
-                  <span className="text-lg">{item.emoji}</span>
+                  <span className="text-base">{item.emoji}</span>
                   <span>{item.text}</span>
                 </button>
               );
@@ -386,20 +400,20 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
           </div>
         </div>
 
-        {/* [🎤 Say it] Practice (Enabled only after the sentence is correct) */}
+        {/* [🎤 Say it] Practice (Orange full-width pill once sentence is correct) */}
         {isSentenceCorrect && (
-          <div className="pt-2 border-t border-slate-200 space-y-2">
-            <span className="text-sm font-bold text-slate-700 block">
+          <div className="pt-2 border-t border-[#FCE9DA] space-y-2.5">
+            <span className="text-xs font-extrabold text-[#2D241E] uppercase block">
               Say your final report out loud:
             </span>
 
             {/* Microphone Help for Kids (shown before the very first recording in the app) */}
             {!hasRecordedSuccessfully && !hasRecording && (
-              <div className="p-2.5 bg-amber-100/90 border border-amber-300 rounded-xl text-center space-y-0.5 animate-in fade-in">
-                <p className="text-xs sm:text-sm font-bold text-amber-950 leading-snug">
+              <div className="p-2.5 bg-[#FCE9DA] rounded-[16px] text-center space-y-0.5 animate-in fade-in">
+                <p className="text-xs font-extrabold text-[#2D241E] leading-snug">
                   Your browser may ask to use the microphone. Ask a parent or teacher to tap 'Allow'.
                 </p>
-                <p className="text-xs font-semibold text-amber-800 leading-tight">
+                <p className="text-[11px] font-bold text-[#8A4B14] leading-tight">
                   마이크 허용 창이 뜨면 선생님이나 부모님께 '허용'을 눌러 달라고 하세요.
                 </p>
               </div>
@@ -410,19 +424,19 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
                 <button
                   type="button"
                   onClick={startRecording}
-                  className="flex-1 min-h-[50px] bg-rose-500 hover:bg-rose-600 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 shadow-xs transition active:scale-95 cursor-pointer"
+                  className="flex-1 min-h-[48px] bg-[#FF9436] hover:bg-[#F58625] text-white font-extrabold text-sm rounded-full flex items-center justify-center gap-2 btn-3d-orange transition active:scale-95 cursor-pointer"
                 >
-                  <Mic className="w-5 h-5" />
-                  <span>{hasRecording ? '🎤 Say it again' : '🎤 Say it'}</span>
+                  <Mic className="w-4 h-4" />
+                  <span>{hasRecording ? '🎤 Say again' : '🎤 Say it'}</span>
                 </button>
               ) : (
                 <button
                   type="button"
                   onClick={stopRecording}
-                  className="flex-1 min-h-[50px] bg-red-600 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 shadow-md animate-pulse cursor-pointer"
+                  className="flex-1 min-h-[48px] bg-rose-500 text-white font-extrabold text-sm rounded-full flex items-center justify-center gap-2 shadow-md animate-pulse ring-2 ring-rose-400 cursor-pointer"
                 >
-                  <MicOff className="w-5 h-5" />
-                  <span>Recording ({durationSeconds}s) · Tap to Stop</span>
+                  <MicOff className="w-4 h-4" />
+                  <span>Stop ({durationSeconds}s) ⏹</span>
                 </button>
               )}
 
@@ -430,13 +444,13 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
                 <button
                   type="button"
                   onClick={playRecording}
-                  className={`min-h-[50px] px-4 rounded-xl font-bold text-sm flex items-center gap-1.5 border-2 transition active:scale-95 cursor-pointer ${
+                  className={`min-h-[48px] px-4 rounded-full font-extrabold text-xs flex items-center gap-1.5 transition active:scale-95 cursor-pointer ${
                     isPlaying
-                      ? 'bg-amber-500 text-white border-amber-600'
-                      : 'bg-white border-amber-300 text-amber-950 hover:bg-amber-50'
+                      ? 'bg-[#8A4B14] text-white'
+                      : 'bg-[#FCE9DA] hover:bg-[#F5DAC4] text-[#2D241E]'
                   }`}
                 >
-                  {isPlaying ? <RotateCcw className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4 fill-current" />}
+                  {isPlaying ? <RotateCcw className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5 fill-current text-[#8A4B14]" />}
                   <span>Listen 🎧</span>
                 </button>
               )}
@@ -444,23 +458,23 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
 
             {/* Hint under buttons */}
             {hasRecording && !hasPlayedAudioOnce && (
-              <p className="text-sm text-amber-800 font-semibold text-center animate-pulse">
+              <p className="text-xs text-[#8A4B14] font-bold text-center animate-pulse">
                 Record, then listen to yourself 🎧
               </p>
             )}
 
             {(isMicUnavailable || hasPracticedWithoutMic) && (
-              <div className="p-3 bg-sky-50 border border-sky-200 rounded-xl text-sm text-sky-900 flex items-center justify-between">
+              <div className="p-3 bg-[#FCE9DA]/70 rounded-[18px] text-xs font-bold text-[#2D241E] flex items-center justify-between">
                 <span>Mic not available on device.</span>
                 {hasPracticedWithoutMic ? (
-                  <span className="text-emerald-700 font-bold text-sm flex items-center gap-1">
-                    <CheckCircle2 className="w-4 h-4" /> Practiced!
+                  <span className="text-[#4CAF50] font-extrabold text-xs flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#4CAF50]" /> Practiced!
                   </span>
                 ) : (
                   <button
                     type="button"
                     onClick={() => setHasPracticedWithoutMic(true)}
-                    className="px-3 py-1 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-lg text-sm cursor-pointer"
+                    className="px-3.5 py-1.5 bg-[#FF9436] hover:bg-[#F58625] text-white font-extrabold rounded-full btn-3d-orange text-xs cursor-pointer"
                   >
                     I said it! 👍
                   </button>
@@ -468,14 +482,14 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
               </div>
             )}
 
-            {/* Requirement 9: Speech Check Button [🟢 Check my words] */}
+            {/* Speech Check Button [🟢 Check my words] */}
             {hasRecording && !isRecording && (
-              <div className="pt-1.5 border-t border-amber-200">
+              <div className="pt-1.5 border-t border-[#FCE9DA]">
                 {!isListening ? (
                   <button
                     type="button"
                     onClick={() => startCheck(finalSentence)}
-                    className="w-full min-h-[46px] rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-xs transition active:scale-95 cursor-pointer"
+                    className="w-full min-h-[48px] rounded-full bg-[#4CAF50] hover:bg-[#43a047] text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-xs transition active:scale-95 cursor-pointer"
                   >
                     <CheckCircle2 className="w-4 h-4" />
                     <span>🟢 Check my words</span>
@@ -484,7 +498,7 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
                   <button
                     type="button"
                     disabled
-                    className="w-full min-h-[46px] rounded-xl bg-emerald-500 text-white font-bold text-sm flex items-center justify-center gap-2 animate-pulse"
+                    className="w-full min-h-[48px] rounded-full bg-[#4CAF50]/80 text-white font-extrabold text-sm flex items-center justify-center gap-2 animate-pulse"
                   >
                     <Mic className="w-4 h-4" />
                     <span>Listening... Say the sentence now!</span>
@@ -492,24 +506,24 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
                 )}
 
                 {speechRecognitionError && (
-                  <p className="text-sm text-slate-600 mt-1.5 text-center font-medium">
+                  <p className="text-xs text-[#8A4B14] mt-1.5 text-center font-bold">
                     {speechRecognitionError}
                   </p>
                 )}
 
                 {/* Speech Recognition Results Display */}
                 {wordResults && matchRatio && (
-                  <div className="mt-2 p-2.5 bg-white rounded-xl border border-emerald-300 space-y-1.5 text-center">
-                    <p className="text-sm font-bold text-emerald-900">
+                  <div className="mt-2 p-2.5 bg-[#FDF3EA] rounded-[18px] space-y-1 text-center">
+                    <p className="text-xs font-extrabold text-[#4CAF50]">
                       Lenny: "Great! {matchRatio.matched} / {matchRatio.total} words!"
                     </p>
-                    <div className="flex flex-wrap items-center justify-center gap-1 text-base font-bold">
+                    <div className="flex flex-wrap items-center justify-center gap-1 text-sm font-extrabold">
                       {wordResults.map((w, idx) => (
                         <span
                           key={idx}
-                          className={`px-1.5 py-0.5 rounded ${
+                          className={`px-2 py-0.5 rounded-full ${
                             w.matched
-                              ? 'bg-emerald-100 text-emerald-800'
+                              ? 'bg-green-100 text-[#4CAF50]'
                               : 'bg-slate-100 text-slate-400'
                           }`}
                         >
@@ -525,75 +539,96 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
         )}
       </div>
 
-      {/* FINAL BADGE & REPORT (Item 10: exact PRD labels) */}
+      {/* Result card: badge icon in a yellow circle, JUNIOR DETECTIVE BADGE, Case closed!, Your guess / Answer row, Clues found progress bar, Word taps boxes, [Replay Case] & [Home] buttons */}
       {isAllCompleted && (
-        <div className="bg-gradient-to-b from-amber-100 to-amber-200/90 rounded-3xl p-4 border-3 border-amber-400 shadow-lg text-center space-y-3 animate-in zoom-in-95">
-          {/* Badge Icon and Exact Heading: "Case closed!" next to Detective Badge */}
-          <div className="flex items-center justify-center gap-2.5">
-            <span className="text-4xl animate-bounce-slow">🏅</span>
-            <h3 className="text-2xl font-extrabold text-amber-950 font-display">
-              Case closed!
-            </h3>
+        <div className="bg-white rounded-[24px] p-5 shadow-sm text-center space-y-3.5 animate-in zoom-in-95">
+          {/* Badge icon in a yellow circle */}
+          <div className="w-16 h-16 rounded-full bg-[#FFD13B] flex items-center justify-center text-3xl mx-auto shadow-xs">
+            🏅
           </div>
 
-          <p className="text-sm font-semibold text-amber-900">
-            Detective Badge Earned · Grade 5–6 Mystery Solver
-          </p>
+          <div>
+            <span className="text-xs font-extrabold text-[#8A4B14] tracking-wider uppercase block">
+              JUNIOR DETECTIVE BADGE
+            </span>
+            <h3 className="text-2xl font-extrabold text-[#2D241E] mt-0.5">
+              Case closed!
+            </h3>
+            <p className="text-xs font-bold text-[#8A4B14] mt-0.5">
+              Grade 5–6 Mystery Solver
+            </p>
+          </div>
 
-          {/* Comparison: Cover Guess vs Real Culprit */}
-          <div className="bg-white/95 rounded-2xl p-3.5 border border-amber-300 text-left space-y-2 shadow-xs">
-            <div className="flex items-center justify-between text-sm">
-              <span className="font-semibold text-slate-600">Your Cover Guess:</span>
-              <span className="font-extrabold text-slate-900">
+          {/* Your guess / Answer row */}
+          <div className="bg-[#FDF3EA] rounded-[18px] p-3 text-left space-y-2">
+            <div className="flex items-center justify-between text-xs sm:text-sm">
+              <span className="font-bold text-[#8A4B14]">Your guess:</span>
+              <span className="font-extrabold text-[#2D241E]">
                 {coverGuess ? `${guessMap[coverGuess].emoji} ${guessMap[coverGuess].label}` : 'None'}
               </span>
             </div>
-            <div className="flex items-center justify-between text-sm border-t border-amber-100 pt-1.5">
-              <span className="font-semibold text-slate-600">Real Culprit:</span>
-              <span className="font-extrabold text-amber-950">🐦 The Magpie (loves shiny buttons!)</span>
+            <div className="flex items-center justify-between text-xs sm:text-sm border-t border-[#FCE9DA] pt-1.5">
+              <span className="font-bold text-[#8A4B14]">Answer:</span>
+              <span className="font-extrabold text-[#2D241E]">🐦 The Magpie (likes shiny buttons!)</span>
             </div>
             {coverGuess === 'bird' ? (
-              <p className="text-sm font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1.5 rounded-lg text-center mt-1">
+              <p className="text-xs font-extrabold text-[#4CAF50] bg-green-50 px-2.5 py-1.5 rounded-full text-center mt-1">
                 🎯 Wow! Your detective instinct was spot on from the start!
               </p>
             ) : (
-              <p className="text-sm font-bold text-amber-900 bg-amber-50 px-2.5 py-1.5 rounded-lg text-center mt-1">
+              <p className="text-xs font-extrabold text-[#8A4B14] bg-[#FCE9DA] px-2.5 py-1.5 rounded-full text-center mt-1">
                 🔍 Great detective work following the clues to the real answer!
               </p>
             )}
           </div>
 
-          {/* Metrics summary: Exact PRD strings */}
-          <div className="grid grid-cols-2 gap-2 text-left">
-            <div className="bg-white/95 rounded-xl p-3 border border-amber-300">
-              <span className="text-xs font-bold text-slate-500 uppercase block">SCORED ACCURACY</span>
-              <p className="text-base font-extrabold text-amber-950 mt-0.5">
-                Clues found: {cluesFoundScore} / 10
-              </p>
+          {/* Clues found: X / 10 with a green progress bar */}
+          <div className="space-y-1.5 text-left">
+            <div className="flex justify-between text-xs sm:text-sm font-extrabold text-[#2D241E]">
+              <span>Clues found: {cluesFoundScore} / 10</span>
+              <span className="text-[#4CAF50]">{Math.round((cluesFoundScore / 10) * 100)}%</span>
             </div>
-
-            <div className="bg-white/95 rounded-xl p-3 border border-amber-300">
-              <span className="text-xs font-bold text-slate-500 uppercase block">FADING INDEPENDENCE</span>
-              <p className="text-sm font-extrabold text-amber-950 mt-0.5">
-                Word taps: Ch.1 {wordTapsByChapter[1]} → Ch.2 {wordTapsByChapter[2]} → Ch.3 {wordTapsByChapter[3]}
-              </p>
+            <div className="w-full h-3.5 bg-[#E8DCCF] rounded-full overflow-hidden">
+              <div
+                className="h-full bg-[#4CAF50] rounded-full transition-all duration-500"
+                style={{ width: `${Math.min(100, Math.max(5, (cluesFoundScore / 10) * 100))}%` }}
+              />
             </div>
           </div>
 
-          {/* Action Buttons: [Replay Case] and [Home] */}
-          <div className="grid grid-cols-2 gap-2 pt-1">
+          {/* Word taps as three small rounded boxes Ch.1 → Ch.2 → Ch.3 */}
+          <div className="space-y-1.5 text-left">
+            <span className="text-xs font-extrabold text-[#8A4B14] uppercase">Word taps</span>
+            <div className="grid grid-cols-3 gap-2">
+              <div className="bg-[#FDF3EA] rounded-[16px] p-2.5 text-center">
+                <span className="text-[11px] font-bold text-[#8A4B14] block">Ch.1</span>
+                <span className="text-sm font-extrabold text-[#2D241E]">{wordTapsByChapter[1]}</span>
+              </div>
+              <div className="bg-[#FDF3EA] rounded-[16px] p-2.5 text-center">
+                <span className="text-[11px] font-bold text-[#8A4B14] block">Ch.2</span>
+                <span className="text-sm font-extrabold text-[#2D241E]">{wordTapsByChapter[2]}</span>
+              </div>
+              <div className="bg-[#FDF3EA] rounded-[16px] p-2.5 text-center">
+                <span className="text-[11px] font-bold text-[#8A4B14] block">Ch.3</span>
+                <span className="text-sm font-extrabold text-[#2D241E]">{wordTapsByChapter[3]}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Buttons side by side: beige pill [Replay Case] and orange pill [Home] */}
+          <div className="flex items-center gap-2.5 pt-1">
             <button
               type="button"
               onClick={onReplayCase}
-              className="min-h-[50px] rounded-2xl bg-white border-2 border-amber-400 text-amber-950 font-bold text-sm flex items-center justify-center gap-1.5 hover:bg-amber-50 shadow-xs transition active:scale-95 cursor-pointer"
+              className="flex-1 min-h-[48px] rounded-full bg-[#FCE9DA] hover:bg-[#F5DAC4] text-[#2D241E] font-extrabold text-sm flex items-center justify-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer"
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="w-4 h-4 text-[#8A4B14]" />
               <span>Replay Case</span>
             </button>
             <button
               type="button"
               onClick={onGoHome}
-              className="min-h-[50px] rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm flex items-center justify-center gap-1.5 shadow-md transition active:scale-95 cursor-pointer"
+              className="flex-1 min-h-[48px] rounded-full bg-[#FF9436] hover:bg-[#F58625] text-white font-extrabold text-sm flex items-center justify-center gap-1.5 btn-3d-orange transition active:scale-95 cursor-pointer"
             >
               <Home className="w-4 h-4" />
               <span>Home</span>

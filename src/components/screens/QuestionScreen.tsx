@@ -197,73 +197,77 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
     }
   };
 
-  const levelBadge = getLevelBadge();
-
   return (
-    <div className="flex flex-col h-full min-h-[580px] justify-between p-3.5 space-y-3 overflow-y-auto">
-      {/* Top Header */}
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col h-full min-h-[580px] justify-between p-3.5 space-y-3 overflow-y-auto text-[#2D241E]">
+      {/* Small scene card at top (rounded thumbnail of the page illustration + one line) */}
+      <div className="bg-white rounded-[20px] p-2 shadow-xs flex items-center gap-3 overflow-hidden">
+        <div className="w-20 h-16 shrink-0 rounded-[14px] overflow-hidden bg-[#FDF3EA] border border-[#FCE9DA]">
+          <StoryIllustration
+            sceneId={`scene-${pageNumber}`}
+            highlightClue={showClueHint}
+          />
+        </div>
+        <div className="flex-1 min-w-0">
+          <span className="text-xs font-extrabold uppercase tracking-wider text-[#8A4B14] block">
+            Page {pageNumber} · Clue Scene
+          </span>
+          <span className="text-xs font-semibold text-[#2D241E]/70 line-clamp-1">
+            Ch.{questionData.chapter} · Clue Check #{pageNumber} / {totalPages}
+          </span>
+        </div>
+      </div>
+
+      {/* Lenny avatar with a yellow "Find it" / "Why?" / "Your idea" pill */}
+      <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
-          <span className="font-extrabold text-sm uppercase tracking-wider text-amber-950 bg-amber-200/90 px-3 py-1 rounded-xl">
-            Clue Check #{pageNumber}
-          </span>
-          <span className="text-sm font-semibold text-slate-600">
-            Page {pageNumber} / {totalPages}
-          </span>
+          <div className="w-10 h-10 rounded-full bg-[#FCE9DA] flex items-center justify-center text-xl shadow-xs">
+            🔍
+          </div>
+          <span className="font-extrabold text-sm text-[#2D241E]">Lenny's Question</span>
         </div>
-        <div className={`px-3 py-1 rounded-xl text-sm font-bold border ${levelBadge.bg} shadow-xs`}>
-          {levelBadge.label}
+        <div className="px-3.5 py-1 rounded-full bg-[#FFD13B] text-[#2D241E] text-xs font-extrabold shadow-xs">
+          {questionData.level === 'Find it'
+            ? 'Find it · 사실 확인'
+            : questionData.level === 'Why?'
+            ? 'Why? · 이유 추론'
+            : 'Your idea · 내 생각'}
         </div>
       </div>
 
-      {/* Picture (Smaller at the top of Question Screen, close to Lenny) */}
-      <div className="w-full max-w-[280px] sm:max-w-[320px] mx-auto shrink-0 shadow-xs">
-        <StoryIllustration
-          sceneId={`scene-${pageNumber}`}
-          highlightClue={showClueHint}
-        />
-      </div>
+      {/* Question in a white card in big bold text */}
+      <div className="bg-white rounded-[24px] p-4 shadow-sm space-y-2.5">
+        <h2 className="text-xl sm:text-2xl font-extrabold text-[#2D241E] leading-snug">
+          {questionData.questionText}
+        </h2>
 
-      {/* Lenny Guide with Question / Expansion Speech Bubble */}
-      <div className="space-y-2">
-        <LennyGuide
-          mood={isAnswerRevealed ? 'happy' : showClueHint ? 'thinking' : 'questioning'}
-          speechText={lennyMessage}
-          subText={lennySubText}
-          onSpeak={() => onSpeakText(lennyMessage)}
-        />
-
-        {/* Clue Hint Box (Shown on first miss) */}
+        {/* Clue Hint Box (Shown on wrong try - no red!) */}
         {showClueHint && !isAnswerRevealed && (
-          <div className="bg-amber-50 border-2 border-amber-300 p-3 rounded-2xl flex items-start gap-2 shadow-xs animate-in fade-in">
-            <Lightbulb className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-            <div className="text-sm text-amber-950 font-medium">
-              <span className="font-bold text-amber-800 block">Lenny's Clue Hint:</span>
+          <div className="bg-[#FCE9DA] p-3 rounded-[18px] flex items-start gap-2 shadow-xs animate-in fade-in">
+            <Lightbulb className="w-5 h-5 text-[#8A4B14] shrink-0 mt-0.5" />
+            <div className="text-sm text-[#2D241E] font-medium">
+              <span className="font-extrabold text-[#8A4B14] block">Lenny's Clue Hint:</span>
               {questionData.hintText}
             </div>
           </div>
         )}
       </div>
 
-      {/* Options Selection (2-3 picture/word answer buttons) */}
+      {/* Answer options as big rounded white cards side by side */}
       <div className="space-y-2">
-        <p className="text-sm font-bold uppercase tracking-wider text-slate-500">
-          {isOpinionQuestion ? "Select your idea:" : "Choose the clue answer:"}
-        </p>
-        <div className="grid grid-cols-1 gap-2.5">
+        <div className={`grid gap-2.5 ${shuffledOptions.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
           {shuffledOptions.map((opt) => {
             const isSelected = selectedOptionId === opt.id;
             const isTargetCorrect = isOpinionQuestion || opt.isCorrect;
 
-            let buttonStyle = 'bg-white border-2 border-amber-200 hover:border-amber-400 text-slate-800 shadow-xs';
+            let cardStyle = 'bg-white text-[#2D241E] shadow-xs hover:bg-[#FDF3EA]/60';
             if (isAnswerRevealed) {
               if (isTargetCorrect) {
-                buttonStyle = 'bg-emerald-50 border-2 border-emerald-500 text-emerald-950 ring-2 ring-emerald-300 shadow-md';
+                cardStyle = 'bg-green-50/90 border-2 border-[#4CAF50] ring-2 ring-[#4CAF50]/20 shadow-sm';
               } else if (isSelected) {
-                buttonStyle = 'bg-amber-50 border-2 border-amber-300 text-slate-600 opacity-80';
+                cardStyle = 'bg-[#FCE9DA]/60 text-[#2D241E]/60';
               }
             } else if (isSelected) {
-              buttonStyle = 'bg-amber-100 border-2 border-amber-400 text-amber-950';
+              cardStyle = 'bg-[#FFD13B]/40 ring-2 ring-[#FFD13B]';
             }
 
             return (
@@ -272,145 +276,152 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
                 type="button"
                 onClick={() => handleSelectOption(opt.id)}
                 disabled={isAnswerRevealed}
-                className={`min-h-[56px] w-full p-3 rounded-2xl flex items-center justify-between text-left transition-all active:scale-98 cursor-pointer ${buttonStyle} ${
-                  isSuccessGreenFlash && isTargetCorrect ? 'animate-pulse' : ''
+                className={`min-h-[72px] p-3 rounded-[24px] flex flex-col items-center justify-center text-center transition-all active:scale-95 cursor-pointer relative ${cardStyle} ${
+                  showClueHint && !isAnswerRevealed && isSelected ? 'animate-shake' : ''
                 }`}
               >
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl p-1 bg-amber-50/80 rounded-xl border border-amber-200">
-                    {opt.emoji}
-                  </span>
-                  <div>
-                    <span className="text-base font-bold text-slate-900 block leading-snug">
-                      {opt.text}
-                    </span>
-                  </div>
-                </div>
-
                 {isAnswerRevealed && isTargetCorrect && (
-                  <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-xs animate-in zoom-in">
-                    <Check className="w-5 h-5 stroke-[3]" />
+                  <div className="absolute -top-1.5 -right-1.5 w-6 h-6 rounded-full bg-[#4CAF50] text-white flex items-center justify-center shadow-xs animate-in zoom-in">
+                    <Check className="w-3.5 h-3.5 stroke-[3]" />
                   </div>
                 )}
+                <span className="text-2xl mb-1">{opt.emoji}</span>
+                <span className="text-sm font-extrabold text-[#2D241E] leading-snug">
+                  {opt.text}
+                </span>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* [🎤 Say it] Section (Once answer is revealed) */}
+      {/* Success feedback in a peach card with a green round smile icon and the expanded sentence */}
       {isAnswerRevealed && (
-        <div className="bg-gradient-to-br from-amber-50 to-orange-50/60 border-2 border-amber-300 p-3.5 rounded-2xl shadow-xs space-y-2.5 animate-in slide-in-from-bottom-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-sm font-bold text-amber-950">
-              <Sparkles className="w-4 h-4 text-amber-600" />
-              <span>Say it aloud · 말하기 연습</span>
+        <div className="bg-[#FCE9DA] rounded-[24px] p-3.5 shadow-xs space-y-2 animate-in fade-in">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-full bg-[#4CAF50] text-white flex items-center justify-center text-sm font-bold shadow-xs">
+              😊
             </div>
-            <button
-              type="button"
-              onClick={() => onSpeakText(activeExpansion)}
-              className="text-sm font-bold text-amber-800 hover:text-amber-950 underline cursor-pointer"
-            >
-              Hear Lenny 🔊
-            </button>
+            <span className="text-xs font-extrabold uppercase tracking-wider text-[#8A4B14]">
+              {isOpinionQuestion ? "Great detective idea!" : "Clue found!"}
+            </span>
           </div>
 
-          {/* Full Sentence Display */}
-          <div className="p-3 bg-white rounded-xl border border-amber-200 shadow-inner">
-            <p className="text-lg font-extrabold text-slate-900 leading-snug">
+          <div className="p-3 bg-white/95 rounded-[18px] shadow-2xs">
+            <p className="text-base sm:text-lg font-extrabold text-[#2D241E] leading-snug">
               "{activeExpansion}"
             </p>
-            <p className="text-base font-semibold text-slate-700 mt-1">
+            <p className="text-xs sm:text-sm font-semibold text-[#8A4B14] mt-1">
               {activeKoreanExpansion}
             </p>
           </div>
+        </div>
+      )}
 
-          {/* Microphone Recording Controls */}
+      {/* "Practice saying the sentence:" card with yellow pill [🎤 Say it] and beige pill [▶ Hear me] side by side */}
+      {isAnswerRevealed && (
+        <div className="bg-white rounded-[24px] p-3.5 shadow-sm space-y-3 animate-in slide-in-from-bottom-2">
+          <span className="text-xs sm:text-sm font-extrabold text-[#2D241E] uppercase tracking-wide block">
+            Practice saying the sentence:
+          </span>
+
+          {/* Microphone Help for Kids (shown before the very first recording in the app) */}
+          {!hasRecordedSuccessfully && !hasRecording && (
+            <div className="p-2.5 bg-[#FCE9DA] rounded-[16px] text-center space-y-0.5 animate-in fade-in">
+              <p className="text-xs font-extrabold text-[#2D241E] leading-snug">
+                Your browser may ask to use the microphone. Ask a parent or teacher to tap 'Allow'.
+              </p>
+              <p className="text-[11px] font-bold text-[#8A4B14] leading-tight">
+                마이크 허용 창이 뜨면 선생님이나 부모님께 '허용'을 눌러 달라고 하세요.
+              </p>
+            </div>
+          )}
+
+          {/* Recording Controls */}
           {micErrorMessage && (isMicUnavailable || hasPracticedWithoutMic) ? (
-            <div className="p-3 bg-sky-50 border border-sky-200 rounded-xl text-sm text-sky-900">
-              <p className="font-semibold">{micErrorMessage}</p>
+            <div className="p-3 bg-[#FCE9DA]/70 rounded-[18px] text-xs font-bold text-[#2D241E]">
+              <p>{micErrorMessage}</p>
               {hasPracticedWithoutMic ? (
-                <p className="mt-2 text-sm font-bold text-emerald-700 flex items-center gap-1">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" /> I practiced saying it aloud! 👍
+                <p className="mt-2 text-xs font-extrabold text-[#4CAF50] flex items-center gap-1">
+                  <CheckCircle2 className="w-4 h-4 text-[#4CAF50]" /> Practiced saying it aloud! 👍
                 </p>
               ) : (
                 <button
                   type="button"
                   onClick={() => setHasPracticedWithoutMic(true)}
-                  className="mt-2 px-3.5 py-1.5 bg-sky-600 hover:bg-sky-700 active:scale-95 text-white text-sm font-bold rounded-lg shadow-xs cursor-pointer"
+                  className="mt-2 px-4 py-2 bg-[#FF9436] hover:bg-[#F58625] text-white text-xs font-extrabold rounded-full btn-3d-orange cursor-pointer"
                 >
                   I practiced saying it! 👍
                 </button>
               )}
             </div>
           ) : (
-            <div className="space-y-2">
-              {/* Requirement 3: Microphone Help for Kids (shown before the very first recording in the app) */}
-              {!hasRecordedSuccessfully && !hasRecording && (
-                <div className="p-2.5 bg-amber-100/90 border border-amber-300 rounded-xl text-center space-y-0.5 animate-in fade-in">
-                  <p className="text-xs sm:text-sm font-bold text-amber-950 leading-snug">
-                    Your browser may ask to use the microphone. Ask a parent or teacher to tap 'Allow'.
-                  </p>
-                  <p className="text-xs font-semibold text-amber-800 leading-tight">
-                    마이크 허용 창이 뜨면 선생님이나 부모님께 '허용'을 눌러 달라고 하세요.
-                  </p>
-                </div>
-              )}
-
-              <div className="flex items-center gap-2 pt-1">
+            <div className="space-y-2.5">
+              {/* Yellow pill [🎤 Say it] and Beige pill [▶ Hear me] side by side */}
+              <div className="flex items-center gap-2">
                 {!isRecording ? (
                   <button
                     type="button"
                     onClick={startRecording}
-                    className="flex-1 min-h-[50px] bg-rose-500 hover:bg-rose-600 active:scale-95 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 shadow-sm transition cursor-pointer"
+                    className="flex-1 min-h-[48px] bg-[#FFD13B] hover:bg-[#f6c62c] text-[#2D241E] font-extrabold text-sm rounded-full flex items-center justify-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer"
                   >
-                    <Mic className="w-5 h-5" />
-                    <span>{hasRecording ? '🎤 Say it again' : '🎤 Say it'}</span>
+                    <Mic className="w-4 h-4 text-[#8A4B14]" />
+                    <span>{hasRecording ? '🎤 Say again' : '🎤 Say it'}</span>
                   </button>
                 ) : (
                   <button
                     type="button"
                     onClick={stopRecording}
-                    className="flex-1 min-h-[50px] bg-red-600 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 shadow-md animate-pulse ring-2 ring-red-400 cursor-pointer"
+                    className="flex-1 min-h-[48px] bg-rose-500 text-white font-extrabold text-sm rounded-full flex items-center justify-center gap-1.5 shadow-md animate-pulse ring-2 ring-rose-400 cursor-pointer"
                   >
-                    <MicOff className="w-5 h-5" />
-                    <span>Recording ({durationSeconds}s) · Tap to Stop ⏹</span>
+                    <MicOff className="w-4 h-4" />
+                    <span>Stop ({durationSeconds}s) ⏹</span>
                   </button>
                 )}
 
-                {/* Play Recorded Voice */}
+                {/* Beige pill [▶ Hear me] */}
+                <button
+                  type="button"
+                  onClick={() => onSpeakText(activeExpansion)}
+                  className="flex-1 min-h-[48px] bg-[#FCE9DA] hover:bg-[#F5DAC4] text-[#2D241E] font-extrabold text-sm rounded-full flex items-center justify-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer"
+                >
+                  <Play className="w-4 h-4 fill-current text-[#8A4B14]" />
+                  <span>▶ Hear me</span>
+                </button>
+
+                {/* Play Recorded Voice (Listen to self) */}
                 {hasRecording && !isRecording && (
                   <button
                     type="button"
                     onClick={playRecording}
-                    className={`min-h-[50px] px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-1.5 border-2 transition active:scale-95 cursor-pointer ${
+                    className={`min-h-[48px] px-3.5 rounded-full font-extrabold text-xs flex items-center justify-center gap-1 transition active:scale-95 cursor-pointer ${
                       isPlaying
-                        ? 'bg-amber-500 text-white border-amber-600'
-                        : 'bg-white border-amber-300 text-amber-950 hover:bg-amber-50'
+                        ? 'bg-[#8A4B14] text-white'
+                        : 'bg-white border border-[#FCE9DA] text-[#2D241E] hover:bg-[#FDF3EA]'
                     }`}
                     aria-label="Play your recording"
                   >
-                    {isPlaying ? <RotateCcw className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4 fill-current" />}
+                    {isPlaying ? <RotateCcw className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5 fill-current" />}
                     <span>Listen 🎧</span>
                   </button>
                 )}
               </div>
 
-              {/* Requirement 4: Hint under buttons */}
+              {/* Hint under buttons */}
               {hasRecording && !hasPlayedAudioOnce && (
-                <p className="text-sm text-amber-800 font-semibold text-center animate-pulse">
+                <p className="text-xs text-[#8A4B14] font-bold text-center animate-pulse">
                   Record, then listen to yourself 🎧
                 </p>
               )}
 
               {/* Speech Check Button [🟢 Check my words] */}
               {hasRecording && !isRecording && (
-                <div className="pt-1 border-t border-amber-200">
+                <div className="pt-1 border-t border-[#FCE9DA]">
                   {!isListening ? (
                     <button
                       type="button"
                       onClick={() => startCheck(activeExpansion)}
-                      className="w-full min-h-[46px] rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-xs transition active:scale-95 cursor-pointer"
+                      className="w-full min-h-[48px] rounded-full bg-[#4CAF50] hover:bg-[#43a047] text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-xs transition active:scale-95 cursor-pointer"
                     >
                       <CheckCircle2 className="w-4 h-4" />
                       <span>🟢 Check my words</span>
@@ -419,7 +430,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
                     <button
                       type="button"
                       disabled
-                      className="w-full min-h-[46px] rounded-xl bg-emerald-500 text-white font-bold text-sm flex items-center justify-center gap-2 animate-pulse"
+                      className="w-full min-h-[48px] rounded-full bg-[#4CAF50]/80 text-white font-extrabold text-sm flex items-center justify-center gap-2 animate-pulse"
                     >
                       <Mic className="w-4 h-4" />
                       <span>Listening... Say the sentence now!</span>
@@ -427,24 +438,24 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
                   )}
 
                   {speechRecognitionError && (
-                    <p className="text-sm text-slate-600 mt-1.5 text-center font-medium">
+                    <p className="text-xs text-[#8A4B14] mt-1.5 text-center font-bold">
                       {speechRecognitionError}
                     </p>
                   )}
 
                   {/* Speech Recognition Results Display */}
                   {wordResults && matchRatio && (
-                    <div className="mt-2 p-2.5 bg-white rounded-xl border border-emerald-300 space-y-1.5 text-center">
-                      <p className="text-sm font-bold text-emerald-900">
+                    <div className="mt-2 p-2.5 bg-[#FDF3EA] rounded-[18px] space-y-1 text-center">
+                      <p className="text-xs font-extrabold text-[#4CAF50]">
                         Lenny: "Great! {matchRatio.matched} / {matchRatio.total} words!"
                       </p>
-                      <div className="flex flex-wrap items-center justify-center gap-1 text-base font-bold">
+                      <div className="flex flex-wrap items-center justify-center gap-1 text-sm font-extrabold">
                         {wordResults.map((w, idx) => (
                           <span
                             key={idx}
-                            className={`px-1.5 py-0.5 rounded ${
+                            className={`px-2 py-0.5 rounded-full ${
                               w.matched
-                                ? 'bg-emerald-100 text-emerald-800'
+                                ? 'bg-green-100 text-[#4CAF50]'
                                 : 'bg-slate-100 text-slate-400'
                             }`}
                           >
@@ -461,16 +472,16 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
         </div>
       )}
 
-      {/* Bottom Next Action */}
-      <div className="pt-1 pb-1">
+      {/* Bottom Next Action: Full-width orange pill [Next ▶] */}
+      <div className="pt-0.5 pb-0.5">
         <button
           type="button"
           onClick={handleNext}
           disabled={!canProceed}
-          className={`w-full min-h-[52px] rounded-2xl font-bold text-base flex items-center justify-center gap-2 shadow-md transition-all active:scale-98 ${
+          className={`w-full min-h-[48px] rounded-full font-extrabold text-base flex items-center justify-center gap-2 transition-all cursor-pointer ${
             canProceed
-              ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 shadow-emerald-500/25 ring-2 ring-emerald-400/50 cursor-pointer'
-              : 'bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed'
+              ? 'bg-[#FF9436] hover:bg-[#F58625] text-white btn-3d-orange'
+              : 'bg-[#E5D7CC] text-[#8C7A6D] cursor-not-allowed'
           }`}
         >
           <span>
