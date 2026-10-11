@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { QuestionData, QuestionOption } from '../../types/story';
 import { LennyGuide } from '../LennyGuide';
+import { StoryIllustration } from '../illustrations/StoryIllustration';
 import { useAudioRecorder } from '../speech/useAudioRecorder';
-import { Check, Mic, MicOff, Play, RotateCcw, ArrowRight, Lightbulb, Sparkles } from 'lucide-react';
+import { useSpeechRecognition } from '../speech/useSpeechRecognition';
+import { Check, Mic, MicOff, Play, RotateCcw, ArrowRight, Lightbulb, Sparkles, CheckCircle2 } from 'lucide-react';
 
 interface QuestionScreenProps {
   questionData: QuestionData;
@@ -31,6 +33,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
   const [isFirstTryCorrect, setIsFirstTryCorrect] = useState(false);
   const [activeExpansion, setActiveExpansion] = useState<string>(questionData.fullSentenceExpansion);
   const [activeKoreanExpansion, setActiveKoreanExpansion] = useState<string>(questionData.koreanFullSentence);
+
   // Randomly shuffle answer options each time question opens
   const [shuffledOptions, setShuffledOptions] = useState<QuestionOption[]>(() =>
     [...questionData.options].sort(() => Math.random() - 0.5)
@@ -45,11 +48,23 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
     isRecording,
     isPlaying,
     hasRecording,
+    hasPlayedAudioOnce,
     isMicUnavailable,
     setIsMicUnavailable,
     micErrorMessage,
     durationSeconds
   } = useAudioRecorder();
+
+  // Speech Recognition Check
+  const {
+    startCheck,
+    isListening,
+    wordResults,
+    matchRatio,
+    isSupported: isSpeechRecognitionSupported,
+    errorMessage: speechRecognitionError,
+    resetCheck
+  } = useSpeechRecognition();
 
   const isOpinionQuestion = questionData.level === 'Your idea';
 
@@ -66,6 +81,8 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
     setIsFirstTryCorrect(false);
     setActiveExpansion(questionData.fullSentenceExpansion);
     setActiveKoreanExpansion(questionData.koreanFullSentence);
+    resetRecording();
+    resetCheck();
 
     const timer = window.setTimeout(() => {
       onSpeakText(questionData.questionText);
@@ -137,28 +154,30 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
   const handleNext = () => {
     stopSpeaking();
     resetRecording();
+    resetCheck();
     onQuestionCompleted(isFirstTryCorrect);
   };
 
-  // Next is enabled only after one recording OR if mic is unavailable / user confirmed
-  const canProceed = isAnswerRevealed && (hasRecording || isMicUnavailable);
+  // Next is enabled only after learner has recorded once AND played it back once (or mic is unavailable)
+  const canProceed =
+    isAnswerRevealed && ((hasRecording && hasPlayedAudioOnce) || isMicUnavailable);
 
   // Badge styling for level tags
   const getLevelBadge = () => {
     switch (questionData.level) {
       case 'Find it':
         return {
-          bg: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+          bg: 'bg-emerald-100 text-emerald-900 border-emerald-300',
           label: 'Find it · 사실 확인'
         };
       case 'Why?':
         return {
-          bg: 'bg-amber-100 text-amber-800 border-amber-300',
+          bg: 'bg-amber-100 text-amber-900 border-amber-300',
           label: 'Why? · 이유 추론'
         };
       case 'Your idea':
         return {
-          bg: 'bg-indigo-100 text-indigo-800 border-indigo-300',
+          bg: 'bg-indigo-100 text-indigo-900 border-indigo-300',
           label: 'Your idea · 내 생각'
         };
     }
@@ -167,24 +186,32 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
   const levelBadge = getLevelBadge();
 
   return (
-    <div className="flex flex-col h-full min-h-[580px] justify-between p-3.5 space-y-3">
+    <div className="flex flex-col h-full min-h-[580px] justify-between p-3.5 space-y-3 overflow-y-auto">
       {/* Top Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="font-extrabold text-xs uppercase tracking-wider text-amber-900 bg-amber-200/80 px-2.5 py-1 rounded-lg">
+          <span className="font-extrabold text-sm uppercase tracking-wider text-amber-950 bg-amber-200/90 px-3 py-1 rounded-xl">
             Clue Check #{pageNumber}
           </span>
-          <span className="text-xs font-semibold text-slate-500">
+          <span className="text-sm font-semibold text-slate-600">
             Page {pageNumber} / {totalPages}
           </span>
         </div>
-        <div className={`px-2.5 py-1 rounded-xl text-xs font-bold border ${levelBadge.bg} shadow-xs`}>
+        <div className={`px-3 py-1 rounded-xl text-sm font-bold border ${levelBadge.bg} shadow-xs`}>
           {levelBadge.label}
         </div>
       </div>
 
+      {/* Picture (Smaller at the top of Question Screen, close to Lenny) */}
+      <div className="w-full max-w-[280px] sm:max-w-[320px] mx-auto shrink-0 shadow-xs">
+        <StoryIllustration
+          sceneId={`scene-${pageNumber}`}
+          highlightClue={showClueHint}
+        />
+      </div>
+
       {/* Lenny Guide with Question / Expansion Speech Bubble */}
-      <div className="space-y-3">
+      <div className="space-y-2">
         <LennyGuide
           mood={isAnswerRevealed ? 'happy' : showClueHint ? 'thinking' : 'questioning'}
           speechText={lennyMessage}
@@ -196,8 +223,8 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
         {showClueHint && !isAnswerRevealed && (
           <div className="bg-amber-50 border-2 border-amber-300 p-3 rounded-2xl flex items-start gap-2 shadow-xs animate-in fade-in">
             <Lightbulb className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-            <div className="text-xs text-amber-950 font-medium">
-              <span className="font-bold text-amber-800 block">Lenny's Detective Clue:</span>
+            <div className="text-sm text-amber-950 font-medium">
+              <span className="font-bold text-amber-800 block">Lenny's Clue Hint:</span>
               {questionData.hintText}
             </div>
           </div>
@@ -205,9 +232,9 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
       </div>
 
       {/* Options Selection (2-3 picture/word answer buttons) */}
-      <div className="space-y-2.5">
-        <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
-          {isOpinionQuestion ? "Select your idea:" : "Choose the best clue answer:"}
+      <div className="space-y-2">
+        <p className="text-sm font-bold uppercase tracking-wider text-slate-500">
+          {isOpinionQuestion ? "Select your idea:" : "Choose the clue answer:"}
         </p>
         <div className="grid grid-cols-1 gap-2.5">
           {shuffledOptions.map((opt) => {
@@ -231,7 +258,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
                 type="button"
                 onClick={() => handleSelectOption(opt.id)}
                 disabled={isAnswerRevealed}
-                className={`min-h-[56px] w-full p-3 rounded-2xl flex items-center justify-between text-left transition-all active:scale-98 ${buttonStyle} ${
+                className={`min-h-[56px] w-full p-3 rounded-2xl flex items-center justify-between text-left transition-all active:scale-98 cursor-pointer ${buttonStyle} ${
                   isSuccessGreenFlash && isTargetCorrect ? 'animate-pulse' : ''
                 }`}
               >
@@ -261,78 +288,141 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
       {isAnswerRevealed && (
         <div className="bg-gradient-to-br from-amber-50 to-orange-50/60 border-2 border-amber-300 p-3.5 rounded-2xl shadow-xs space-y-2.5 animate-in slide-in-from-bottom-2">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-amber-900">
+            <div className="flex items-center gap-1.5 text-sm font-bold text-amber-950">
               <Sparkles className="w-4 h-4 text-amber-600" />
               <span>Say it aloud · 말하기 연습</span>
             </div>
             <button
               type="button"
               onClick={() => onSpeakText(activeExpansion)}
-              className="text-xs font-bold text-amber-700 hover:text-amber-900 underline"
+              className="text-sm font-bold text-amber-800 hover:text-amber-950 underline cursor-pointer"
             >
               Hear Lenny 🔊
             </button>
           </div>
 
           {/* Full Sentence Display */}
-          <div className="p-2.5 bg-white rounded-xl border border-amber-200 shadow-inner">
-            <p className="text-base font-extrabold text-slate-900 leading-snug">
+          <div className="p-3 bg-white rounded-xl border border-amber-200 shadow-inner">
+            <p className="text-lg font-extrabold text-slate-900 leading-snug">
               "{activeExpansion}"
             </p>
-            <p className="text-xs font-medium text-slate-500 mt-1">
+            <p className="text-base font-medium text-slate-700 mt-1">
               {activeKoreanExpansion}
             </p>
           </div>
 
           {/* Microphone Recording Controls */}
           {micErrorMessage && isMicUnavailable ? (
-            <div className="p-2.5 bg-sky-50 border border-sky-200 rounded-xl text-xs text-sky-900">
+            <div className="p-3 bg-sky-50 border border-sky-200 rounded-xl text-sm text-sky-900">
               <p className="font-semibold">{micErrorMessage}</p>
               <button
                 type="button"
                 onClick={() => setIsMicUnavailable(false)}
-                className="mt-1.5 px-3 py-1 bg-sky-600 text-white text-xs font-bold rounded-lg shadow-xs"
+                className="mt-2 px-3.5 py-1.5 bg-sky-600 text-white text-sm font-bold rounded-lg shadow-xs cursor-pointer"
               >
                 I practiced saying it! 👍
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-2 pt-1">
-              {!isRecording ? (
-                <button
-                  type="button"
-                  onClick={startRecording}
-                  className="flex-1 min-h-[48px] bg-rose-500 hover:bg-rose-600 active:scale-95 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 shadow-sm transition"
-                >
-                  <Mic className="w-4 h-4" />
-                  <span>{hasRecording ? 'Record Again 🎤' : 'Say it now 🎤'}</span>
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={stopRecording}
-                  className="flex-1 min-h-[48px] bg-red-600 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 shadow-md animate-pulse ring-2 ring-red-400"
-                >
-                  <MicOff className="w-4 h-4" />
-                  <span>Recording ({durationSeconds}s) · Tap to Stop ⏹</span>
-                </button>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 pt-1">
+                {!isRecording ? (
+                  <button
+                    type="button"
+                    onClick={startRecording}
+                    className="flex-1 min-h-[50px] bg-rose-500 hover:bg-rose-600 active:scale-95 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 shadow-sm transition cursor-pointer"
+                  >
+                    <Mic className="w-5 h-5" />
+                    <span>{hasRecording ? '🎤 Say it again' : '🎤 Say it'}</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={stopRecording}
+                    className="flex-1 min-h-[50px] bg-red-600 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 shadow-md animate-pulse ring-2 ring-red-400 cursor-pointer"
+                  >
+                    <MicOff className="w-5 h-5" />
+                    <span>Recording ({durationSeconds}s) · Tap to Stop ⏹</span>
+                  </button>
+                )}
+
+                {/* Play Recorded Voice */}
+                {hasRecording && !isRecording && (
+                  <button
+                    type="button"
+                    onClick={playRecording}
+                    className={`min-h-[50px] px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-1.5 border-2 transition active:scale-95 cursor-pointer ${
+                      isPlaying
+                        ? 'bg-amber-500 text-white border-amber-600'
+                        : 'bg-white border-amber-300 text-amber-950 hover:bg-amber-50'
+                    }`}
+                    aria-label="Play your recording"
+                  >
+                    {isPlaying ? <RotateCcw className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4 fill-current" />}
+                    <span>Listen 🎧</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Requirement 4: Hint under buttons */}
+              {hasRecording && !hasPlayedAudioOnce && (
+                <p className="text-sm text-amber-800 font-semibold text-center animate-pulse">
+                  Record, then listen to yourself 🎧
+                </p>
               )}
 
-              {/* Play Recorded Voice */}
+              {/* Requirement 9: Speech Check Button [🟢 Check my words] */}
               {hasRecording && !isRecording && (
-                <button
-                  type="button"
-                  onClick={playRecording}
-                  className={`min-h-[48px] px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-1.5 border-2 transition active:scale-95 ${
-                    isPlaying
-                      ? 'bg-amber-500 text-white border-amber-600'
-                      : 'bg-white border-amber-300 text-amber-900 hover:bg-amber-50'
-                  }`}
-                  aria-label="Play your recording"
-                >
-                  {isPlaying ? <RotateCcw className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4 fill-current" />}
-                  <span>Hear Me</span>
-                </button>
+                <div className="pt-1 border-t border-amber-200">
+                  {!isListening ? (
+                    <button
+                      type="button"
+                      onClick={() => startCheck(activeExpansion)}
+                      className="w-full min-h-[46px] rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-xs transition active:scale-95 cursor-pointer"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>🟢 Check my words</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled
+                      className="w-full min-h-[46px] rounded-xl bg-emerald-500 text-white font-bold text-sm flex items-center justify-center gap-2 animate-pulse"
+                    >
+                      <Mic className="w-4 h-4" />
+                      <span>Listening... Say the sentence now!</span>
+                    </button>
+                  )}
+
+                  {speechRecognitionError && (
+                    <p className="text-sm text-slate-600 mt-1.5 text-center font-medium">
+                      {speechRecognitionError}
+                    </p>
+                  )}
+
+                  {/* Speech Recognition Results Display */}
+                  {wordResults && matchRatio && (
+                    <div className="mt-2 p-2.5 bg-white rounded-xl border border-emerald-300 space-y-1.5 text-center">
+                      <p className="text-sm font-bold text-emerald-900">
+                        Lenny: "Great! {matchRatio.matched} / {matchRatio.total} words!"
+                      </p>
+                      <div className="flex flex-wrap items-center justify-center gap-1 text-base font-bold">
+                        {wordResults.map((w, idx) => (
+                          <span
+                            key={idx}
+                            className={`px-1.5 py-0.5 rounded ${
+                              w.matched
+                                ? 'bg-emerald-100 text-emerald-800'
+                                : 'bg-slate-100 text-slate-400'
+                            }`}
+                          >
+                            {w.raw}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           )}
@@ -340,7 +430,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
       )}
 
       {/* Bottom Next Action */}
-      <div className="pt-1">
+      <div className="pt-1 pb-1">
         <button
           type="button"
           onClick={handleNext}
@@ -355,7 +445,9 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
             {!isAnswerRevealed
               ? 'Answer the question'
               : !hasRecording && !isMicUnavailable
-              ? 'Record your voice to continue 🎤'
+              ? 'Record your voice 🎤'
+              : hasRecording && !hasPlayedAudioOnce && !isMicUnavailable
+              ? 'Listen to your voice 🎧'
               : 'Next Clue ▶'}
           </span>
           {canProceed && <ArrowRight className="w-5 h-5" />}

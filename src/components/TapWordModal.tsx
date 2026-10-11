@@ -55,22 +55,22 @@ export const TapWordModal: React.FC<TapWordModalProps> = ({
         </div>
 
         {/* English simple definition */}
-        <p className="text-xs text-slate-600 mt-2 px-2 leading-relaxed">
+        <p className="text-sm text-slate-700 mt-2 px-2 leading-relaxed font-medium">
           {wordInfo.simpleDefinition}
         </p>
 
         {/* Korean Meaning (Chapter 1 ONLY!) */}
         {chapter === 1 ? (
           <div className="mt-4 pt-3 border-t border-amber-100 bg-amber-50/70 -mx-5 -mb-5 p-4 rounded-b-2xl">
-            <span className="text-[11px] font-bold text-amber-800 uppercase tracking-wider block mb-0.5">
+            <span className="text-sm font-bold text-amber-800 uppercase tracking-wider block mb-0.5">
               Korean Meaning
             </span>
-            <p className="text-lg font-bold text-amber-950 font-sans">
+            <p className="text-xl font-bold text-amber-950 font-sans">
               {wordInfo.koreanMeaning}
             </p>
           </div>
         ) : (
-          <div className="mt-3 text-[11px] text-slate-400 font-medium">
+          <div className="mt-3 text-sm text-slate-500 font-medium">
             🔍 Detective clue word
           </div>
         )}

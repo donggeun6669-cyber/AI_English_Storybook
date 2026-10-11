@@ -164,11 +164,11 @@ export const LennyGuide: React.FC<LennyGuideProps> = ({
           <div className="flex items-start justify-between gap-2">
             <div>
               <div className="flex items-center gap-1.5 mb-0.5">
-                <span className="font-bold text-xs uppercase tracking-wider text-amber-700">Lenny</span>
-                <span className="text-[10px] text-slate-400">· Detective Guide</span>
+                <span className="font-bold text-sm uppercase tracking-wider text-amber-800">Lenny</span>
+                <span className="text-sm text-slate-500">· Detective Guide</span>
               </div>
               <p className="text-base font-semibold leading-snug text-slate-900">{speechText}</p>
-              {subText && <p className="text-xs text-slate-500 mt-1 font-medium">{subText}</p>}
+              {subText && <p className="text-sm text-slate-600 mt-1 font-medium">{subText}</p>}
             </div>
 
             {onSpeak && (

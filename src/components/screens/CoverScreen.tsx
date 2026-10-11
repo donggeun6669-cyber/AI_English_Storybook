@@ -33,14 +33,14 @@ export const CoverScreen: React.FC<CoverScreenProps> = ({ onStartCase, onLennySp
     <div className="flex flex-col h-full min-h-[580px] justify-between p-4 space-y-4">
       {/* Top Header */}
       <header className="text-center pt-1">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-bold tracking-wide uppercase shadow-xs mb-1.5">
-          <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-100 text-amber-900 text-sm font-bold tracking-wide uppercase shadow-xs mb-1.5">
+          <Sparkles className="w-4 h-4 text-amber-600" />
           <span>Mystery Case #01</span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight font-display">
           Clue Readers
         </h1>
-        <p className="text-sm font-semibold text-amber-700">The Missing Mascot · 호랑이 티기 실종 사건</p>
+        <p className="text-base font-semibold text-amber-700">The Missing Mascot · 호랑이 티기 실종 사건</p>
       </header>
 
       {/* Cover Illustration */}
@@ -52,9 +52,9 @@ export const CoverScreen: React.FC<CoverScreenProps> = ({ onStartCase, onLennySp
       <div className="space-y-3">
         <LennyGuide
           mood={selectedGuess ? 'happy' : 'questioning'}
-          speechText="Who took the mascot doll? Make your guess before we start!"
+          speechText="Who took the mascot?"
           subText="Choose one suspect to start the investigation."
-          onSpeak={() => onLennySpeak?.("Who took the mascot doll? Make your guess before we start!")}
+          onSpeak={() => onLennySpeak?.("Who took the mascot?")}
         />
 
         {/* 3 Suspect Guess Options */}
@@ -66,7 +66,7 @@ export const CoverScreen: React.FC<CoverScreenProps> = ({ onStartCase, onLennySp
                 key={opt.id}
                 type="button"
                 onClick={() => handleOptionSelect(opt.id)}
-                className={`relative min-h-[64px] flex flex-col items-center justify-center p-2.5 rounded-2xl border-2 transition-all active:scale-95 text-center ${
+                className={`relative min-h-[72px] flex flex-col items-center justify-center p-2.5 rounded-2xl border-2 transition-all active:scale-95 text-center cursor-pointer ${
                   isSelected
                     ? 'bg-amber-100 border-amber-500 shadow-md ring-2 ring-amber-400'
                     : 'bg-white border-amber-200 hover:border-amber-300 hover:bg-amber-50/50 shadow-xs'
@@ -74,12 +74,12 @@ export const CoverScreen: React.FC<CoverScreenProps> = ({ onStartCase, onLennySp
               >
                 {isSelected && (
                   <div className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-amber-600 text-white flex items-center justify-center shadow-xs">
-                    <Check className="w-3 h-3 stroke-[3]" />
+                    <Check className="w-3.5 h-3.5 stroke-[3]" />
                   </div>
                 )}
                 <span className="text-2xl mb-0.5">{opt.emoji}</span>
-                <span className="text-xs font-bold text-slate-800 leading-tight">{opt.title}</span>
-                <span className="text-[10px] text-slate-500 font-medium">{opt.subtitle}</span>
+                <span className="text-sm font-bold text-slate-900 leading-tight">{opt.title}</span>
+                <span className="text-sm text-slate-600 font-medium">{opt.subtitle}</span>
               </button>
             );
           })}

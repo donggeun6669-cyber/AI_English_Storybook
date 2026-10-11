@@ -85,13 +85,13 @@ export const STORY_PAGES: StoryPageData[] = [
     sentences: [
       "Teacher Kim comes in.",
       "She looks at the window.",
-      "A cool breeze blows.",
+      "A cool breeze comes in.",
       "The window was open!"
     ],
     koreanSentences: [
       "김 선생님이 교실로 들어오세요.",
       "선생님이 창문을 바라보세요.",
-      "시원한 산들바람이 불어요.",
+      "시원한 산들바람이 들어와요.",
       "창문이 열려 있었어요!"
     ],
     newWord: {
@@ -113,18 +113,20 @@ export const STORY_PAGES: StoryPageData[] = [
     sentences: [
       "Max the dog sits outside.",
       "He chews a brown stick.",
-      "Minji checks his dog house."
+      "Minji suspects Max.",
+      "She checks his dog house."
     ],
     koreanSentences: [
       "강아지 맥스가 밖에 앉아 있어요.",
       "맥스는 갈색 나뭇가지를 씹고 있어요.",
+      "민지는 맥스를 의심해요.",
       "민지는 맥스의 개집을 확인해요."
     ],
     newWord: {
       word: "suspects",
-      koreanMeaning: "의심하다 (용의자)",
+      koreanMeaning: "의심하다",
       emoji: "🐶",
-      simpleDefinition: "Someone people think took something."
+      simpleDefinition: "To think someone did something wrong."
     },
     clueSummary: "Minji checks if Max took the toy."
   },
@@ -136,12 +138,12 @@ export const STORY_PAGES: StoryPageData[] = [
     sceneId: "scene-6",
     sentences: [
       "Max has no tiger doll.",
-      "Jun checks the soft mud.",
+      "Jun looks at the wet ground.",
       "He sees tiny bird footprints!"
     ],
     koreanSentences: [
       "맥스에게는 호랑이 인형이 없어요.",
-      "준이가 부드러운 진흙을 살펴봐요.",
+      "준이가 젖은 땅을 봐요.",
       "준이는 아주 작은 새 발자국을 봐요!"
     ],
     newWord: {
@@ -160,12 +162,12 @@ export const STORY_PAGES: StoryPageData[] = [
     sceneId: "scene-7",
     sentences: [
       "Minji walks to the tree.",
-      "She spots a shiny yellow button.",
+      "She sees a shiny yellow button.",
       "It fell from Tigi's shirt!"
     ],
     koreanSentences: [
       "민지가 큰 나무 쪽으로 걸어가요.",
-      "민지는 반짝이는 노란 단추를 발견해요.",
+      "민지는 반짝이는 노란 단추를 봐요.",
       "단추는 티기의 셔츠에서 떨어진 거예요!"
     ],
     newWord: {
@@ -184,13 +186,13 @@ export const STORY_PAGES: StoryPageData[] = [
     sceneId: "scene-8",
     sentences: [
       "Jun hears a loud cry.",
-      "\"Caw! Caw!\" goes the bird.",
-      "Jun points at a thick branch."
+      "The bird says, \"Caw! Caw!\"",
+      "Jun points at a big branch."
     ],
     koreanSentences: [
       "준이가 큰 울음소리를 들어요.",
-      "\"깍! 깍!\" 새가 소리쳐요.",
-      "준이가 굵은 나뭇가지를 가리켜요."
+      "새가 \"깍! 깍!\" 하고 울어요.",
+      "준이가 큰 나뭇가지를 가리켜요."
     ],
     newWord: {
       word: "branch",
@@ -209,12 +211,12 @@ export const STORY_PAGES: StoryPageData[] = [
     title: "The Clever Magpie",
     sceneId: "scene-9",
     sentences: [
-      "A black-and-white magpie sits high.",
+      "A black-and-white magpie sits in the tree.",
       "It has a long tail.",
       "Magpies love shiny things!"
     ],
     koreanSentences: [
-      "검고 흰 까치가 높이 앉아 있어요.",
+      "검고 흰 까치가 나무에 앉아 있어요.",
       "까치는 긴 꼬리를 가지고 있어요.",
       "까치들은 반짝이는 물건을 아주 좋아해요!"
     ],
@@ -233,12 +235,12 @@ export const STORY_PAGES: StoryPageData[] = [
     title: "Found in the Nest!",
     sceneId: "scene-10",
     sentences: [
-      "Minji spots a big nest.",
+      "Minji sees a big nest.",
       "She sees orange fur inside.",
       "Tigi the tiger is safe!"
     ],
     koreanSentences: [
-      "민지가 커다란 새둥지를 발견해요.",
+      "민지는 커다란 새둥지를 봐요.",
       "둥지 안에서 주황색 털이 보여요.",
       "호랑이 티기가 무사해요!"
     ],
@@ -257,14 +259,14 @@ export const STORY_PAGES: StoryPageData[] = [
     title: "Teacher Kim's Help",
     sceneId: "scene-11",
     sentences: [
-      "Teacher Kim brings a long pole.",
-      "She gently lifts Tigi down.",
-      "Everyone gives a happy cheer."
+      "Teacher Kim brings a long stick.",
+      "She gently takes Tigi down.",
+      "Everyone claps and smiles."
     ],
     koreanSentences: [
-      "김 선생님이 긴 막대를 가져오세요.",
+      "김 선생님이 긴 막대기를 가져오세요.",
       "선생님이 티기를 조심스럽게 내려주세요.",
-      "모두가 기쁘게 환호해요."
+      "모두가 박수를 치며 웃어요."
     ],
     newWord: {
       word: "gently",
@@ -281,14 +283,14 @@ export const STORY_PAGES: StoryPageData[] = [
     title: "Sports Day Hero",
     sceneId: "scene-12",
     sentences: [
-      "Sports Day starts with joy.",
+      "Sports Day starts today.",
       "Students cheer for their team.",
-      "The friendly magpie watches happily."
+      "The magpie watches from the tree."
     ],
     koreanSentences: [
-      "즐겁게 운동회가 시작돼요.",
+      "오늘 운동회가 시작돼요.",
       "학생들이 자기 팀을 힘차게 응원해요.",
-      "다정한 까치도 기분 좋게 바라봐요."
+      "까치는 나무에서 바라봐요."
     ],
     newWord: {
       word: "cheer",
@@ -305,8 +307,8 @@ export const QUESTIONS_DATA: Record<number, QuestionData> = {
     pageId: 1,
     chapter: 1,
     level: "Find it",
-    questionText: "Who is missing before Sports Day?",
-    hintText: "Remember the class toy doll in the open box!",
+    questionText: "What is missing before Sports Day?",
+    hintText: "Look at the open box.",
     options: [
       { id: "a", text: "Tigi the tiger mascot", emoji: "🐯", isCorrect: true },
       { id: "b", text: "Teacher Kim", emoji: "👩‍🏫", isCorrect: false }
@@ -319,7 +321,7 @@ export const QUESTIONS_DATA: Record<number, QuestionData> = {
     chapter: 1,
     level: "Find it",
     questionText: "What is on the classroom desk?",
-    hintText: "Look at the open container where Tigi used to sleep.",
+    hintText: "Look at the desk.",
     options: [
       { id: "a", text: "An empty box", emoji: "📦", isCorrect: true },
       { id: "b", text: "A soccer ball", emoji: "⚽", isCorrect: false }
@@ -331,8 +333,8 @@ export const QUESTIONS_DATA: Record<number, QuestionData> = {
     pageId: 3,
     chapter: 1,
     level: "Find it",
-    questionText: "What color are the feathers on the window?",
-    hintText: "Notice the two classic bird colors on the sill.",
+    questionText: "What color are the feathers?",
+    hintText: "Look at the feathers Jun found.",
     options: [
       { id: "a", text: "Black and white", emoji: "🪶", isCorrect: true },
       { id: "b", text: "Red and yellow", emoji: "🎨", isCorrect: false }
@@ -383,34 +385,34 @@ export const QUESTIONS_DATA: Record<number, QuestionData> = {
     pageId: 7,
     chapter: 2,
     level: "Why?",
-    questionText: "Why is the yellow button an important clue?",
-    hintText: "Think about what Tigi the tiger wears.",
+    questionText: "Why is the button a good clue?",
+    hintText: "Where did Minji find the button?",
     options: [
-      { id: "a", text: "It fell from Tigi's shirt", emoji: "✨", isCorrect: true },
-      { id: "b", text: "It is a heavy gold coin", emoji: "🪙", isCorrect: false }
+      { id: "a", text: "Tigi was near the tree", emoji: "✨", isCorrect: true },
+      { id: "b", text: "Minji lost her button", emoji: "👚", isCorrect: false }
     ],
-    fullSentenceExpansion: "Yes! The button fell from Tigi's shirt.",
-    koreanFullSentence: "맞아요! 그 단추는 티기의 옷에서 떨어진 것이에요."
+    fullSentenceExpansion: "Yes! The button shows Tigi was near the tree.",
+    koreanFullSentence: "맞아요! 단추를 보면 티기가 나무 근처에 있었다는 걸 알 수 있어요."
   },
   8: {
     pageId: 8,
     chapter: 2,
     level: "Why?",
-    questionText: "Why does Jun point up at the tree?",
-    hintText: "Listen to the loud 'Caw! Caw!' cry from above.",
+    questionText: "Why does Jun look up at the tree?",
+    hintText: "Listen to the loud 'Caw! Caw!' from the branch.",
     options: [
-      { id: "a", text: "He hears a bird calling", emoji: "🌳", isCorrect: true },
+      { id: "a", text: "The bird may have Tigi", emoji: "🌳", isCorrect: true },
       { id: "b", text: "He wants to pick green apples", emoji: "🍏", isCorrect: false }
     ],
-    fullSentenceExpansion: "Yes! Jun hears a bird calling high in the tree.",
-    koreanFullSentence: "맞아요! 준이는 나무 위에서 새가 우는 소리를 들었어요."
+    fullSentenceExpansion: "Yes! Jun thinks the bird may have Tigi.",
+    koreanFullSentence: "맞아요! 준이는 새가 티기를 가지고 있을 거라고 생각해요."
   },
   9: {
     pageId: 9,
     chapter: 3,
     level: "Find it",
-    questionText: "What bird is perched high in the tree?",
-    hintText: "It has black and white feathers and loves shiny things.",
+    questionText: "What bird is in the tree?",
+    hintText: "It is black and white. It loves shiny things.",
     options: [
       { id: "a", text: "A clever magpie", emoji: "🐦", isCorrect: true },
       { id: "b", text: "A small brown sparrow", emoji: "🐤", isCorrect: false }

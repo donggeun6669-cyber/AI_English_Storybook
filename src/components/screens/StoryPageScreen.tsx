@@ -120,10 +120,10 @@ export const StoryPageScreen: React.FC<StoryPageScreenProps> = ({
   const renderHelpMeter = () => {
     const count = pageData.chapter === 1 ? 3 : pageData.chapter === 2 ? 2 : 1;
     return (
-      <div className="flex items-center gap-0.5 px-2 py-1 rounded-xl bg-amber-100/90 border border-amber-300 text-xs font-bold text-amber-900 shadow-xs">
-        <span className="text-[10px] uppercase tracking-wider text-amber-800 mr-0.5">Help</span>
+      <div className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-100/90 border border-amber-300 text-sm font-bold text-amber-900 shadow-xs">
+        <span className="text-xs uppercase tracking-wider text-amber-800 mr-0.5">Help</span>
         {Array.from({ length: count }).map((_, i) => (
-          <span key={i} className="text-sm">🔍</span>
+          <span key={i} className="text-base">🔍</span>
         ))}
       </div>
     );
@@ -131,14 +131,11 @@ export const StoryPageScreen: React.FC<StoryPageScreenProps> = ({
 
   return (
     <div className="flex flex-col h-full min-h-[580px] justify-between p-3.5 space-y-3">
-      {/* Top Header Bar */}
+      {/* Top Header Bar with exact PRD format: Ch.1 · Page 3 / 12 */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="font-extrabold text-xs uppercase tracking-wider text-amber-900 bg-amber-200/80 px-2.5 py-1 rounded-lg">
-            Ch.{pageData.chapter}
-          </span>
-          <span className="text-xs font-semibold text-slate-500">
-            Page {pageData.pageNumber} / {totalPages}
+        <div className="flex items-center">
+          <span className="font-extrabold text-sm sm:text-base text-amber-950 bg-amber-200/90 px-3 py-1 rounded-xl shadow-xs">
+            Ch.{pageData.chapter} · Page {pageData.pageNumber} / {totalPages}
           </span>
         </div>
         <div>{renderHelpMeter()}</div>
@@ -188,9 +185,6 @@ export const StoryPageScreen: React.FC<StoryPageScreenProps> = ({
                         title="Tap to see picture & meaning"
                       >
                         {rawWord}
-                        <span className="ml-0.5 text-xs inline-block opacity-80">
-                          {pageData.newWord.emoji}
-                        </span>
                       </button>
                     );
                   }
@@ -213,15 +207,15 @@ export const StoryPageScreen: React.FC<StoryPageScreenProps> = ({
           })}
         </div>
 
-        {/* Korean Translation Box (when toggled) */}
+        {/* Korean Translation Box (when toggled, 16px font text-base) */}
         {showKo && (
-          <div className="mt-3 pt-2.5 border-t border-amber-200 bg-amber-50/70 -mx-4 -mb-4 p-3 rounded-b-2xl animate-in fade-in">
-            <span className="text-[10px] font-bold text-amber-800 uppercase tracking-wider block mb-1">
+          <div className="mt-3 pt-2.5 border-t border-amber-200 bg-amber-50/70 -mx-4 -mb-4 p-3.5 rounded-b-2xl animate-in fade-in">
+            <span className="text-sm font-bold text-amber-800 uppercase tracking-wider block mb-1">
               한국어 번역
             </span>
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               {pageData.koreanSentences.map((koLine, idx) => (
-                <p key={idx} className="text-sm font-semibold text-slate-700 leading-snug">
+                <p key={idx} className="text-base font-semibold text-slate-800 leading-snug">
                   {koLine}
                 </p>
               ))}
@@ -237,7 +231,7 @@ export const StoryPageScreen: React.FC<StoryPageScreenProps> = ({
           <button
             type="button"
             onClick={handlePlayAudio}
-            className={`min-h-[50px] col-span-1 rounded-2xl font-bold text-xs flex flex-col items-center justify-center transition active:scale-95 shadow-xs ${
+            className={`min-h-[52px] col-span-1 rounded-2xl font-bold text-sm flex flex-col items-center justify-center transition active:scale-95 shadow-xs cursor-pointer ${
               isSpeaking
                 ? 'bg-amber-500 text-white shadow-amber-500/30 ring-2 ring-amber-400'
                 : 'bg-white text-slate-800 border-2 border-amber-300 hover:bg-amber-50'
@@ -251,14 +245,14 @@ export const StoryPageScreen: React.FC<StoryPageScreenProps> = ({
           <button
             type="button"
             onClick={toggleSlowSpeed}
-            className={`min-h-[50px] col-span-1 rounded-2xl font-bold text-xs flex flex-col items-center justify-center transition active:scale-95 border-2 shadow-xs ${
+            className={`min-h-[52px] col-span-1 rounded-2xl font-bold text-sm flex flex-col items-center justify-center transition active:scale-95 border-2 shadow-xs cursor-pointer ${
               isSlowSpeed
-                ? 'bg-amber-100 border-amber-500 text-amber-900 font-extrabold ring-1 ring-amber-400'
+                ? 'bg-amber-100 border-amber-500 text-amber-950 font-extrabold ring-2 ring-amber-400 shadow-sm'
                 : 'bg-white border-amber-300 text-slate-700 hover:bg-amber-50'
             }`}
           >
             <Gauge className="w-4 h-4 text-amber-600" />
-            <span className="mt-0.5">{isSlowSpeed ? '0.8× Slow' : '1.0× Norm'}</span>
+            <span className="mt-0.5">0.8×</span>
           </button>
 
           {/* [KO] Toggle Button */}
@@ -267,7 +261,7 @@ export const StoryPageScreen: React.FC<StoryPageScreenProps> = ({
               type="button"
               onClick={handleToggleKo}
               disabled={pageData.chapter === 2 && chapterKoUsesRemaining <= 0 && !showKo}
-              className={`min-h-[50px] col-span-1 rounded-2xl font-bold text-xs flex flex-col items-center justify-center transition active:scale-95 border-2 shadow-xs ${
+              className={`min-h-[52px] col-span-1 rounded-2xl font-bold text-sm flex flex-col items-center justify-center transition active:scale-95 border-2 shadow-xs cursor-pointer ${
                 showKo
                   ? 'bg-sky-500 text-white border-sky-600 shadow-sky-500/20'
                   : pageData.chapter === 2 && chapterKoUsesRemaining <= 0
@@ -281,7 +275,7 @@ export const StoryPageScreen: React.FC<StoryPageScreenProps> = ({
               </span>
             </button>
           ) : (
-            <div className="col-span-1 min-h-[50px] flex items-center justify-center rounded-2xl bg-slate-50 border border-slate-200 text-[10px] text-slate-400 font-bold text-center px-1">
+            <div className="col-span-1 min-h-[52px] flex items-center justify-center rounded-2xl bg-slate-100 border border-slate-200 text-sm text-slate-500 font-bold text-center px-1">
               English Only
             </div>
           )}
@@ -291,9 +285,9 @@ export const StoryPageScreen: React.FC<StoryPageScreenProps> = ({
             type="button"
             onClick={onGoToQuestion}
             disabled={!isNextUnlocked}
-            className={`min-h-[50px] col-span-1 rounded-2xl font-bold text-xs flex flex-col items-center justify-center transition active:scale-95 shadow-md ${
+            className={`min-h-[52px] col-span-1 rounded-2xl font-bold text-sm flex flex-col items-center justify-center transition active:scale-95 shadow-md ${
               isNextUnlocked
-                ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 shadow-emerald-500/25 ring-2 ring-emerald-400/50'
+                ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 shadow-emerald-500/25 ring-2 ring-emerald-400/50 cursor-pointer'
                 : 'bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed'
             }`}
           >
