@@ -29,7 +29,7 @@ export const StoryIllustration: React.FC<StoryIllustrationProps> = ({
         <img
           src={imageSrc}
           alt=""
-          className="w-full h-full object-cover select-none"
+          className={`w-full h-full object-cover select-none ${sceneId === 'cover' ? 'object-top' : 'object-center'}`}
           draggable={false}
         />
       </div>
