@@ -22,6 +22,8 @@ interface CaseClosedScreenProps {
   onReplayCase: () => void;
   onGoHome: () => void;
   onSpeakText: (text: string) => void;
+  hasRecordedSuccessfully?: boolean;
+  onRecordSuccess?: () => void;
 }
 
 // Randomly shuffle cards ensuring they are never initially in the correct order [1, 2, 3, 4]
@@ -40,7 +42,9 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
   wordTapsByChapter,
   onReplayCase,
   onGoHome,
-  onSpeakText
+  onSpeakText,
+  hasRecordedSuccessfully = false,
+  onRecordSuccess
 }) => {
   // Top Half: 4 cards sequencing state
   const [shuffledCards, setShuffledCards] = useState<StoryOrderCard[]>(() => getShuffledCards());
@@ -56,6 +60,7 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
   const [slot2WrongCount, setSlot2WrongCount] = useState<number>(0);
   const [wobblingChipId, setWobblingChipId] = useState<string | null>(null);
   const [lennySentenceAdvice, setLennySentenceAdvice] = useState<string | null>(null);
+  const [hasPracticedWithoutMic, setHasPracticedWithoutMic] = useState<boolean>(false);
 
   // Recording state
   const {
@@ -81,9 +86,17 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
     resetCheck
   } = useSpeechRecognition();
 
+  // Track successful recording
+  useEffect(() => {
+    if (hasRecording) {
+      onRecordSuccess?.();
+    }
+  }, [hasRecording, onRecordSuccess]);
+
   // Validation rules
   const isSentenceCorrect = selectedSlot1 === 'magpie' && selectedSlot2 === 'shiny';
-  const isSpeechFinished = (hasRecording && hasPlayedAudioOnce) || isMicUnavailable;
+  const isSpeechFinished =
+    (hasRecording && hasPlayedAudioOnce) || isMicUnavailable || hasPracticedWithoutMic;
   const isAllCompleted = isSequenceCorrect && isSentenceCorrect && isSpeechFinished;
 
   // Trigger confetti when completed
@@ -379,6 +392,19 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
             <span className="text-sm font-bold text-slate-700 block">
               Say your final report out loud:
             </span>
+
+            {/* Microphone Help for Kids (shown before the very first recording in the app) */}
+            {!hasRecordedSuccessfully && !hasRecording && (
+              <div className="p-2.5 bg-amber-100/90 border border-amber-300 rounded-xl text-center space-y-0.5 animate-in fade-in">
+                <p className="text-xs sm:text-sm font-bold text-amber-950 leading-snug">
+                  Your browser may ask to use the microphone. Ask a parent or teacher to tap 'Allow'.
+                </p>
+                <p className="text-xs font-semibold text-amber-800 leading-tight">
+                  마이크 허용 창이 뜨면 선생님이나 부모님께 '허용'을 눌러 달라고 하세요.
+                </p>
+              </div>
+            )}
+
             <div className="flex items-center gap-2">
               {!isRecording ? (
                 <button
@@ -416,23 +442,29 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
               )}
             </div>
 
-            {/* Requirement 4: Hint under buttons */}
+            {/* Hint under buttons */}
             {hasRecording && !hasPlayedAudioOnce && (
               <p className="text-sm text-amber-800 font-semibold text-center animate-pulse">
                 Record, then listen to yourself 🎧
               </p>
             )}
 
-            {isMicUnavailable && (
+            {(isMicUnavailable || hasPracticedWithoutMic) && (
               <div className="p-3 bg-sky-50 border border-sky-200 rounded-xl text-sm text-sky-900 flex items-center justify-between">
                 <span>Mic not available on device.</span>
-                <button
-                  type="button"
-                  onClick={() => setIsMicUnavailable(false)}
-                  className="px-3 py-1 bg-sky-600 text-white font-bold rounded-lg text-sm cursor-pointer"
-                >
-                  I said it! 👍
-                </button>
+                {hasPracticedWithoutMic ? (
+                  <span className="text-emerald-700 font-bold text-sm flex items-center gap-1">
+                    <CheckCircle2 className="w-4 h-4" /> Practiced!
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setHasPracticedWithoutMic(true)}
+                    className="px-3 py-1 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-lg text-sm cursor-pointer"
+                  >
+                    I said it! 👍
+                  </button>
+                )}
               </div>
             )}
 

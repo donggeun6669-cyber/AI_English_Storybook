@@ -42,6 +42,13 @@ export default function App() {
     toggleSlowSpeed
   } = useSpeechSynthesis();
 
+  // Track if learner has ever recorded successfully in the app session
+  const [hasEverRecordedSuccessfully, setHasEverRecordedSuccessfully] = useState<boolean>(false);
+
+  const handleRecordSuccess = useCallback(() => {
+    setHasEverRecordedSuccessfully(true);
+  }, []);
+
   // 1. Cover Screen Actions
   const handleStartCase = (guess: CoverGuess) => {
     stop();
@@ -51,6 +58,13 @@ export default function App() {
   };
 
   // 2. Story Page Actions
+  const handleGoBack = () => {
+    stop();
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
+
   const handleUseKo = () => {
     const currentChapter = STORY_PAGES[currentPage - 1].chapter;
     if (currentChapter === 2) {
@@ -140,6 +154,7 @@ export default function App() {
               onUseKo={handleUseKo}
               onRecordWordTap={handleRecordWordTap}
               onGoToQuestion={handleGoToQuestion}
+              onGoBack={handleGoBack}
               speakText={speak}
               stopSpeaking={stop}
               isSpeaking={isSpeaking}
@@ -160,6 +175,8 @@ export default function App() {
                 speak(text, { onEndCallback: onEnd })
               }
               stopSpeaking={stop}
+              hasRecordedSuccessfully={hasEverRecordedSuccessfully}
+              onRecordSuccess={handleRecordSuccess}
             />
           )}
 
@@ -171,6 +188,8 @@ export default function App() {
               onReplayCase={handleReplayCase}
               onGoHome={handleGoHome}
               onSpeakText={(text) => speak(text)}
+              hasRecordedSuccessfully={hasEverRecordedSuccessfully}
+              onRecordSuccess={handleRecordSuccess}
             />
           )}
         </div>

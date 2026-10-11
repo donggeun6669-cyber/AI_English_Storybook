@@ -13,6 +13,8 @@ interface QuestionScreenProps {
   onQuestionCompleted: (wasFirstTryCorrect: boolean) => void;
   onSpeakText: (text: string, onEnd?: () => void) => void;
   stopSpeaking: () => void;
+  hasRecordedSuccessfully?: boolean;
+  onRecordSuccess?: () => void;
 }
 
 export const QuestionScreen: React.FC<QuestionScreenProps> = ({
@@ -21,7 +23,9 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
   totalPages,
   onQuestionCompleted,
   onSpeakText,
-  stopSpeaking
+  stopSpeaking,
+  hasRecordedSuccessfully = false,
+  onRecordSuccess
 }) => {
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
@@ -33,6 +37,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
   const [isFirstTryCorrect, setIsFirstTryCorrect] = useState(false);
   const [activeExpansion, setActiveExpansion] = useState<string>(questionData.fullSentenceExpansion);
   const [activeKoreanExpansion, setActiveKoreanExpansion] = useState<string>(questionData.koreanFullSentence);
+  const [hasPracticedWithoutMic, setHasPracticedWithoutMic] = useState<boolean>(false);
 
   // Randomly shuffle answer options each time question opens
   const [shuffledOptions, setShuffledOptions] = useState<QuestionOption[]>(() =>
@@ -68,6 +73,13 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
 
   const isOpinionQuestion = questionData.level === 'Your idea';
 
+  // Mark successful recording in global state
+  useEffect(() => {
+    if (hasRecording) {
+      onRecordSuccess?.();
+    }
+  }, [hasRecording, onRecordSuccess]);
+
   // Read out question when opening and re-shuffle options
   useEffect(() => {
     setShuffledOptions([...questionData.options].sort(() => Math.random() - 0.5));
@@ -81,6 +93,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
     setIsFirstTryCorrect(false);
     setActiveExpansion(questionData.fullSentenceExpansion);
     setActiveKoreanExpansion(questionData.koreanFullSentence);
+    setHasPracticedWithoutMic(false);
     resetRecording();
     resetCheck();
 
@@ -158,9 +171,10 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
     onQuestionCompleted(isFirstTryCorrect);
   };
 
-  // Next is enabled only after learner has recorded once AND played it back once (or mic is unavailable)
+  // Next is enabled only after learner has recorded once AND played it back once (or mic is unavailable / practiced without mic)
   const canProceed =
-    isAnswerRevealed && ((hasRecording && hasPlayedAudioOnce) || isMicUnavailable);
+    isAnswerRevealed &&
+    ((hasRecording && hasPlayedAudioOnce) || isMicUnavailable || hasPracticedWithoutMic);
 
   // Badge styling for level tags
   const getLevelBadge = () => {
@@ -306,25 +320,43 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
             <p className="text-lg font-extrabold text-slate-900 leading-snug">
               "{activeExpansion}"
             </p>
-            <p className="text-base font-medium text-slate-700 mt-1">
+            <p className="text-base font-semibold text-slate-700 mt-1">
               {activeKoreanExpansion}
             </p>
           </div>
 
           {/* Microphone Recording Controls */}
-          {micErrorMessage && isMicUnavailable ? (
+          {micErrorMessage && (isMicUnavailable || hasPracticedWithoutMic) ? (
             <div className="p-3 bg-sky-50 border border-sky-200 rounded-xl text-sm text-sky-900">
               <p className="font-semibold">{micErrorMessage}</p>
-              <button
-                type="button"
-                onClick={() => setIsMicUnavailable(false)}
-                className="mt-2 px-3.5 py-1.5 bg-sky-600 text-white text-sm font-bold rounded-lg shadow-xs cursor-pointer"
-              >
-                I practiced saying it! 👍
-              </button>
+              {hasPracticedWithoutMic ? (
+                <p className="mt-2 text-sm font-bold text-emerald-700 flex items-center gap-1">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" /> I practiced saying it aloud! 👍
+                </p>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setHasPracticedWithoutMic(true)}
+                  className="mt-2 px-3.5 py-1.5 bg-sky-600 hover:bg-sky-700 active:scale-95 text-white text-sm font-bold rounded-lg shadow-xs cursor-pointer"
+                >
+                  I practiced saying it! 👍
+                </button>
+              )}
             </div>
           ) : (
             <div className="space-y-2">
+              {/* Requirement 3: Microphone Help for Kids (shown before the very first recording in the app) */}
+              {!hasRecordedSuccessfully && !hasRecording && (
+                <div className="p-2.5 bg-amber-100/90 border border-amber-300 rounded-xl text-center space-y-0.5 animate-in fade-in">
+                  <p className="text-xs sm:text-sm font-bold text-amber-950 leading-snug">
+                    Your browser may ask to use the microphone. Ask a parent or teacher to tap 'Allow'.
+                  </p>
+                  <p className="text-xs font-semibold text-amber-800 leading-tight">
+                    마이크 허용 창이 뜨면 선생님이나 부모님께 '허용'을 눌러 달라고 하세요.
+                  </p>
+                </div>
+              )}
+
               <div className="flex items-center gap-2 pt-1">
                 {!isRecording ? (
                   <button
@@ -371,7 +403,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
                 </p>
               )}
 
-              {/* Requirement 9: Speech Check Button [🟢 Check my words] */}
+              {/* Speech Check Button [🟢 Check my words] */}
               {hasRecording && !isRecording && (
                 <div className="pt-1 border-t border-amber-200">
                   {!isListening ? (
@@ -444,9 +476,9 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
           <span>
             {!isAnswerRevealed
               ? 'Answer the question'
-              : !hasRecording && !isMicUnavailable
+              : !hasRecording && !isMicUnavailable && !hasPracticedWithoutMic
               ? 'Record your voice 🎤'
-              : hasRecording && !hasPlayedAudioOnce && !isMicUnavailable
+              : hasRecording && !hasPlayedAudioOnce && !isMicUnavailable && !hasPracticedWithoutMic
               ? 'Listen to your voice 🎧'
               : 'Next Clue ▶'}
           </span>

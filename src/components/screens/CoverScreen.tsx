@@ -2,15 +2,31 @@ import React, { useState } from 'react';
 import { StoryIllustration } from '../illustrations/StoryIllustration';
 import { LennyGuide } from '../LennyGuide';
 import { CoverGuess } from '../../types/story';
-import { Compass, Sparkles, Check } from 'lucide-react';
+import { Compass, Sparkles, Check, X, HelpCircle, BookOpen } from 'lucide-react';
 
 interface CoverScreenProps {
   onStartCase: (guess: CoverGuess) => void;
   onLennySpeak?: (text: string) => void;
 }
 
+const TARGET_WORDS = [
+  'mascot',
+  'empty',
+  'feathers',
+  'breeze',
+  'suspects',
+  'footprints',
+  'shiny',
+  'branch',
+  'magpie',
+  'nest',
+  'gently',
+  'cheer'
+];
+
 export const CoverScreen: React.FC<CoverScreenProps> = ({ onStartCase, onLennySpeak }) => {
   const [selectedGuess, setSelectedGuess] = useState<CoverGuess | null>(null);
+  const [showGuide, setShowGuide] = useState<boolean>(false);
 
   const options: { id: CoverGuess; title: string; subtitle: string; emoji: string }[] = [
     { id: 'boy', title: 'A Boy', subtitle: 'A classmate?', emoji: '👦' },
@@ -30,9 +46,19 @@ export const CoverScreen: React.FC<CoverScreenProps> = ({ onStartCase, onLennySp
   };
 
   return (
-    <div className="flex flex-col h-full min-h-[580px] justify-between p-4 space-y-4">
-      {/* Top Header */}
-      <header className="text-center pt-1">
+    <div className="flex flex-col h-full min-h-[580px] justify-between p-4 space-y-4 relative">
+      {/* Top Header with [?] Guide Button at top-right */}
+      <header className="text-center pt-1 relative">
+        <button
+          type="button"
+          onClick={() => setShowGuide(true)}
+          className="absolute top-0 right-0 w-8 h-8 rounded-full bg-white border-2 border-amber-300 hover:bg-amber-100 text-amber-900 font-extrabold text-sm flex items-center justify-center shadow-xs transition active:scale-95 cursor-pointer z-10"
+          title="Teacher & Parent Guide"
+          aria-label="Teacher & Parent Guide"
+        >
+          ?
+        </button>
+
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-100 text-amber-900 text-sm font-bold tracking-wide uppercase shadow-xs mb-1.5">
           <Sparkles className="w-4 h-4 text-amber-600" />
           <span>Mystery Case #01</span>
@@ -102,6 +128,97 @@ export const CoverScreen: React.FC<CoverScreenProps> = ({ onStartCase, onLennySp
           <span>{selectedGuess ? 'Start the Case 🔍' : 'Choose a suspect to start'}</span>
         </button>
       </div>
+
+      {/* Teacher & Parent Guide Modal */}
+      {showGuide && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in"
+          onClick={() => setShowGuide(false)}
+        >
+          <div
+            className="relative w-full max-w-sm bg-white rounded-3xl p-5 shadow-2xl border-4 border-amber-300 text-left animate-in zoom-in-95 max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-amber-200">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-amber-800">
+                  <HelpCircle className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-extrabold text-slate-900 leading-tight font-display">
+                    Teacher & Parent Guide
+                  </h3>
+                  <p className="text-xs font-semibold text-amber-700">선생님 & 학부모 안내</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowGuide(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 hover:bg-slate-200 transition cursor-pointer"
+                aria-label="Close guide"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* 3 Short lines on how to use */}
+            <div className="mt-3.5 space-y-2.5 text-sm text-slate-800">
+              <div className="flex items-start gap-2.5 p-2 bg-amber-50/70 rounded-xl border border-amber-100">
+                <span className="text-base shrink-0">1️⃣</span>
+                <p className="font-semibold leading-snug">
+                  <strong className="text-amber-950 font-bold">Read with fading help:</strong> Listen to the story and tap underlined words (Ch.1 audio auto-plays & KO → Ch.2 audio on tap → Ch.3 English only).
+                </p>
+              </div>
+
+              <div className="flex items-start gap-2.5 p-2 bg-amber-50/70 rounded-xl border border-amber-100">
+                <span className="text-base shrink-0">2️⃣</span>
+                <p className="font-semibold leading-snug">
+                  <strong className="text-amber-950 font-bold">Answer Lenny & say aloud:</strong> Solve Lenny's clue question, then practice speaking the sentence aloud (takes about 15 minutes).
+                </p>
+              </div>
+
+              <div className="flex items-start gap-2.5 p-2 bg-amber-50/70 rounded-xl border border-amber-100">
+                <span className="text-base shrink-0">3️⃣</span>
+                <p className="font-semibold leading-snug">
+                  <strong className="text-amber-950 font-bold">Microphone permission:</strong> Please help the child tap <span className="underline font-bold text-rose-700">'Allow'</span> when the browser asks to use the microphone.
+                </p>
+              </div>
+            </div>
+
+            {/* List of 12 Target Words */}
+            <div className="mt-4 pt-3 border-t border-amber-200">
+              <div className="flex items-center gap-1.5 mb-2">
+                <BookOpen className="w-4 h-4 text-amber-700" />
+                <span className="text-xs font-bold uppercase tracking-wider text-amber-900">
+                  12 Target Words (A1 Vocabulary)
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {TARGET_WORDS.map((w, idx) => (
+                  <span
+                    key={w}
+                    className="px-2.5 py-1 bg-amber-100 text-amber-950 text-xs font-bold rounded-lg border border-amber-300"
+                  >
+                    {idx + 1}. {w}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Close Button */}
+            <div className="mt-4 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowGuide(false)}
+                className="w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-sm rounded-xl shadow-xs transition active:scale-95 cursor-pointer"
+              >
+                Got it! Let's Start 👍
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

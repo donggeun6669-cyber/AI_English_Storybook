@@ -5,15 +5,17 @@ import { NewWordInfo, ChapterNumber } from '../types/story';
 interface TapWordModalProps {
   wordInfo: NewWordInfo;
   chapter: ChapterNumber;
+  exampleSentence?: string;
   onClose: () => void;
-  onSpeakWord: (word: string) => void;
+  onSpeakText: (text: string) => void;
 }
 
 export const TapWordModal: React.FC<TapWordModalProps> = ({
   wordInfo,
   chapter,
+  exampleSentence,
   onClose,
-  onSpeakWord
+  onSpeakText
 }) => {
   return (
     <div
@@ -28,7 +30,7 @@ export const TapWordModal: React.FC<TapWordModalProps> = ({
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 hover:bg-slate-200 transition"
+          className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 hover:bg-slate-200 transition cursor-pointer"
           aria-label="Close word popup"
         >
           <X className="w-5 h-5" />
@@ -39,23 +41,44 @@ export const TapWordModal: React.FC<TapWordModalProps> = ({
           <span>{wordInfo.emoji}</span>
         </div>
 
-        {/* Word Title + Pronounce Button */}
-        <div className="flex items-center justify-center gap-2 mt-3">
+        {/* Word Title */}
+        <div className="mt-2">
           <h3 className="text-2xl font-bold text-slate-900 tracking-wide font-display">
             {wordInfo.word}
           </h3>
+        </div>
+
+        {/* Example sentence from this page */}
+        {exampleSentence && (
+          <div className="mt-2.5 p-2.5 bg-amber-50/85 rounded-xl border border-amber-200 text-base font-bold text-slate-800 leading-snug">
+            "{exampleSentence}"
+          </div>
+        )}
+
+        {/* Two small listen buttons: [🔊 word] and [🔊 sentence] */}
+        <div className="flex items-center justify-center gap-2 mt-2.5">
           <button
             type="button"
-            onClick={() => onSpeakWord(wordInfo.word)}
-            className="p-2 text-amber-700 bg-amber-100 hover:bg-amber-200 active:scale-95 rounded-xl transition"
-            aria-label={`Pronounce ${wordInfo.word}`}
+            onClick={() => onSpeakText(wordInfo.word)}
+            className="flex-1 py-1.5 px-2 bg-amber-100 hover:bg-amber-200 text-amber-900 text-sm font-bold rounded-xl flex items-center justify-center gap-1 transition active:scale-95 cursor-pointer border border-amber-300"
           >
-            <Volume2 className="w-4 h-4" />
+            <Volume2 className="w-4 h-4 text-amber-700" />
+            <span>🔊 word</span>
           </button>
+          {exampleSentence && (
+            <button
+              type="button"
+              onClick={() => onSpeakText(exampleSentence)}
+              className="flex-1 py-1.5 px-2 bg-amber-100 hover:bg-amber-200 text-amber-900 text-sm font-bold rounded-xl flex items-center justify-center gap-1 transition active:scale-95 cursor-pointer border border-amber-300"
+            >
+              <Volume2 className="w-4 h-4 text-amber-700" />
+              <span>🔊 sentence</span>
+            </button>
+          )}
         </div>
 
         {/* English simple definition */}
-        <p className="text-sm text-slate-700 mt-2 px-2 leading-relaxed font-medium">
+        <p className="text-sm text-slate-700 mt-2.5 px-2 leading-relaxed font-medium">
           {wordInfo.simpleDefinition}
         </p>
 

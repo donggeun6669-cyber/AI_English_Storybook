@@ -11,6 +11,7 @@ interface StoryPageScreenProps {
   onUseKo: () => void;
   onRecordWordTap: (chapter: ChapterNumber) => void;
   onGoToQuestion: () => void;
+  onGoBack: () => void;
   // Speech controls passed from parent or hook
   speakText: (text: string, options?: { rateOverride?: number; onEndCallback?: () => void; wordsList?: string[] }) => void;
   stopSpeaking: () => void;
@@ -27,6 +28,7 @@ export const StoryPageScreen: React.FC<StoryPageScreenProps> = ({
   onUseKo,
   onRecordWordTap,
   onGoToQuestion,
+  onGoBack,
   speakText,
   stopSpeaking,
   isSpeaking,
@@ -129,11 +131,32 @@ export const StoryPageScreen: React.FC<StoryPageScreenProps> = ({
     );
   };
 
+  // Example sentence on this page containing the active tapped word
+  const exampleSentenceForPopup = useMemo(() => {
+    if (!activeWordPopup) return undefined;
+    const targetWord = cleanWord(activeWordPopup.word);
+    const foundSentence = pageData.sentences.find((s) => {
+      const words = s.split(/\s+/).map(cleanWord);
+      return words.includes(targetWord);
+    });
+    return foundSentence || pageData.sentences[0];
+  }, [activeWordPopup, pageData.sentences]);
+
   return (
     <div className="flex flex-col h-full min-h-[580px] justify-between p-3.5 space-y-3">
-      {/* Top Header Bar with exact PRD format: Ch.1 · Page 3 / 12 */}
+      {/* Top Header Bar with exact PRD format: Ch.1 · Page 3 / 12 and [◀ Back] button */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center">
+        <div className="flex items-center gap-2">
+          {pageData.pageNumber > 1 && (
+            <button
+              type="button"
+              onClick={onGoBack}
+              className="py-1 px-2.5 rounded-xl bg-white border border-amber-300 hover:bg-amber-100 text-amber-950 text-sm font-bold shadow-xs flex items-center gap-1 transition active:scale-95 cursor-pointer"
+              title="Previous page"
+            >
+              ◀ Back
+            </button>
+          )}
           <span className="font-extrabold text-sm sm:text-base text-amber-950 bg-amber-200/90 px-3 py-1 rounded-xl shadow-xs">
             Ch.{pageData.chapter} · Page {pageData.pageNumber} / {totalPages}
           </span>
@@ -302,8 +325,9 @@ export const StoryPageScreen: React.FC<StoryPageScreenProps> = ({
         <TapWordModal
           wordInfo={activeWordPopup}
           chapter={pageData.chapter}
+          exampleSentence={exampleSentenceForPopup}
           onClose={() => setActiveWordPopup(null)}
-          onSpeakWord={(word) => speakText(word)}
+          onSpeakText={(text) => speakText(text)}
         />
       )}
     </div>
