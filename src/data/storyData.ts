@@ -373,7 +373,7 @@ export const QUESTIONS_DATA: Record<number, QuestionData> = {
     chapter: 2,
     level: "Why?",
     questionText: "Why is Max not the mascot thief?",
-    hintText: "Look at the small shape of the footprints in the mud.",
+    hintText: "Look at the small footprints on the wet ground.",
     options: [
       { id: "a", text: "The footprints are from a bird", emoji: "🐾", isCorrect: true },
       { id: "b", text: "Max was sleeping in bed", emoji: "😴", isCorrect: false }
@@ -452,7 +452,7 @@ export const QUESTIONS_DATA: Record<number, QuestionData> = {
     chapter: 3,
     level: "Find it",
     questionText: "Who brings Tigi down safely?",
-    hintText: "She reached up with a long pole.",
+    hintText: "She brings a long stick.",
     options: [
       { id: "a", text: "Teacher Kim", emoji: "👩‍🏫", isCorrect: true },
       { id: "b", text: "Max the dog", emoji: "🐶", isCorrect: false }
@@ -509,7 +509,7 @@ export const CASE_CLOSED_CARDS: StoryOrderCard[] = [
     id: 2,
     stepNumber: 2,
     title: "Finding Clues",
-    description: "Minji and Jun spot feathers, bird tracks, and a shiny button.",
+    description: "Minji and Jun find feathers, bird footprints, and a shiny button.",
     emoji: "🔍"
   },
   {
