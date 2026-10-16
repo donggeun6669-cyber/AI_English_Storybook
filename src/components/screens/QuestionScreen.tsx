@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { QuestionData, QuestionOption } from '../../types/story';
-import { LennyGuide } from '../LennyGuide';
+import { LennyGuide, LennyMood } from '../LennyGuide';
 import { StoryIllustration } from '../illustrations/StoryIllustration';
 import { useAudioRecorder } from '../speech/useAudioRecorder';
 import { useSpeechRecognition } from '../speech/useSpeechRecognition';
-import { Check, Mic, MicOff, Play, RotateCcw, ArrowRight, Lightbulb, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Check, Mic, MicOff, Play, RotateCcw, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 interface QuestionScreenProps {
   questionData: QuestionData;
@@ -30,10 +30,13 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
   const [attemptCount, setAttemptCount] = useState(0);
-  const [lennyMessage, setLennyMessage] = useState<string>(questionData.questionText);
-  const [lennySubText, setLennySubText] = useState<string | undefined>();
+
+  // Lenny Guide State
+  const [lennyMood, setLennyMood] = useState<LennyMood>('questioning');
+  const [lennyMessage, setLennyMessage] = useState<string>("Let's find the clue!");
+  const [lennySubText, setLennySubText] = useState<string | undefined>("Read the question and pick an answer.");
+
   const [showClueHint, setShowClueHint] = useState(false);
-  const [isSuccessGreenFlash, setIsSuccessGreenFlash] = useState(false);
   const [isFirstTryCorrect, setIsFirstTryCorrect] = useState(false);
   const [activeExpansion, setActiveExpansion] = useState<string>(questionData.fullSentenceExpansion);
   const [activeKoreanExpansion, setActiveKoreanExpansion] = useState<string>(questionData.koreanFullSentence);
@@ -55,7 +58,6 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
     hasRecording,
     hasPlayedAudioOnce,
     isMicUnavailable,
-    setIsMicUnavailable,
     micErrorMessage,
     durationSeconds
   } = useAudioRecorder();
@@ -66,7 +68,6 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
     isListening,
     wordResults,
     matchRatio,
-    isSupported: isSpeechRecognitionSupported,
     errorMessage: speechRecognitionError,
     resetCheck
   } = useSpeechRecognition();
@@ -86,10 +87,10 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
     setSelectedOptionId(null);
     setIsAnswerRevealed(false);
     setAttemptCount(0);
-    setLennyMessage(questionData.questionText);
-    setLennySubText(undefined);
+    setLennyMood('questioning');
+    setLennyMessage("Let's find the clue!");
+    setLennySubText("Read the question and pick an answer.");
     setShowClueHint(false);
-    setIsSuccessGreenFlash(false);
     setIsFirstTryCorrect(false);
     setActiveExpansion(questionData.fullSentenceExpansion);
     setActiveKoreanExpansion(questionData.koreanFullSentence);
@@ -98,13 +99,28 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
     resetCheck();
 
     const timer = window.setTimeout(() => {
-      onSpeakText(questionData.questionText);
+      onSpeakText("Let's find the clue!");
     }, 300);
     return () => {
       window.clearTimeout(timer);
       stopSpeaking();
     };
   }, [questionData.pageId]);
+
+  // Handle updates to Lenny after recording or listening
+  useEffect(() => {
+    if (!isAnswerRevealed) return;
+
+    if (hasPlayedAudioOnce || hasPracticedWithoutMic) {
+      setLennyMood('happy');
+      setLennyMessage("Well done! Tap Next Clue ▶");
+      setLennySubText(undefined);
+    } else if (hasRecording && !isRecording) {
+      setLennyMood('happy');
+      setLennyMessage("Now tap Listen 🎧 to hear yourself.");
+      setLennySubText(undefined);
+    }
+  }, [isAnswerRevealed, hasRecording, isRecording, hasPlayedAudioOnce, hasPracticedWithoutMic]);
 
   const handleSelectOption = (optionId: string) => {
     if (isAnswerRevealed) return; // already solved
@@ -127,21 +143,25 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
 
       setActiveExpansion(targetExpansion);
       setActiveKoreanExpansion(targetKorean);
-
-      setIsSuccessGreenFlash(true);
       setIsAnswerRevealed(true);
-      setLennyMessage(targetExpansion);
-      setLennySubText("Now practice speaking the sentence!");
+      setLennyMood('happy');
 
-      // Lenny expands it into full sentence and reads aloud
+      if (isOpinionQuestion) {
+        setLennyMessage("Great idea, Detective! Now say this:");
+      } else {
+        setLennyMessage("Great job, Detective! Now say this:");
+      }
+      setLennySubText(targetExpansion);
+
+      // Read target sentence aloud
       onSpeakText(targetExpansion);
     } else {
       // Never a red X!
-      setIsSuccessGreenFlash(false);
       setShowClueHint(true);
 
       if (newAttempt === 1) {
-        setLennyMessage("Hmm, look again! A clue is waiting for you.");
+        setLennyMood('thinking');
+        setLennyMessage("Hmm, look again!");
         setLennySubText(`Hint: ${questionData.hintText}`);
         onSpeakText("Hmm, look again!");
       } else {
@@ -157,8 +177,9 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
         setActiveExpansion(targetExpansion);
         setActiveKoreanExpansion(targetKorean);
 
-        setLennyMessage(targetExpansion);
-        setLennySubText("Here is the answer! Let's practice saying it together.");
+        setLennyMood('happy');
+        setLennyMessage("Here is the answer. Let's say it together:");
+        setLennySubText(targetExpansion);
         onSpeakText(targetExpansion);
       }
     }
@@ -176,26 +197,39 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
     isAnswerRevealed &&
     ((hasRecording && hasPlayedAudioOnce) || isMicUnavailable || hasPracticedWithoutMic);
 
-  // Badge styling for level tags
-  const getLevelBadge = () => {
-    switch (questionData.level) {
-      case 'Find it':
-        return {
-          bg: 'bg-emerald-100 text-emerald-900 border-emerald-300',
-          label: 'Find it · 사실 확인'
-        };
-      case 'Why?':
-        return {
-          bg: 'bg-amber-100 text-amber-900 border-amber-300',
-          label: 'Why? · 이유 추론'
-        };
-      case 'Your idea':
-        return {
-          bg: 'bg-indigo-100 text-indigo-900 border-indigo-300',
-          label: 'Your idea · 내 생각'
-        };
+  // Instructional state for the bottom button and its small Korean help line
+  const getBottomButtonState = () => {
+    if (canProceed) {
+      return {
+        text: 'Next Clue ▶',
+        korean: null
+      };
     }
+    if (!isAnswerRevealed) {
+      return {
+        text: '☝️ Pick an answer first',
+        korean: '먼저 답을 골라요'
+      };
+    }
+    if (!hasRecording && !isMicUnavailable && !hasPracticedWithoutMic) {
+      return {
+        text: '☝️ Tap 🎤 Say it first',
+        korean: '먼저 위의 🎤 Say it을 눌러 문장을 말해요'
+      };
+    }
+    if (hasRecording && !hasPlayedAudioOnce && !isMicUnavailable && !hasPracticedWithoutMic) {
+      return {
+        text: '☝️ Tap Listen 🎧 first',
+        korean: '먼저 Listen 🎧으로 내 목소리를 들어요'
+      };
+    }
+    return {
+      text: '☝️ Tap 🎤 Say it first',
+      korean: '먼저 위의 🎤 Say it을 눌러 문장을 말해요'
+    };
   };
+
+  const bottomButtonState = getBottomButtonState();
 
   return (
     <div className="flex flex-col h-full min-h-[580px] justify-between p-3.5 space-y-3 overflow-y-auto text-[#2D241E]">
@@ -217,21 +251,27 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
         </div>
       </div>
 
-      {/* Lenny avatar with a yellow "Find it" / "Why?" / "Your idea" pill */}
-      <div className="flex items-center justify-between px-1">
-        <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-full bg-[#FCE9DA] flex items-center justify-center text-xl shadow-xs">
-            🔍
+      {/* Lenny Guide with Lenny's round face image + speech bubble, placed under scene card and above question card */}
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between px-1">
+          <span className="text-xs font-extrabold uppercase tracking-wider text-[#8A4B14] flex items-center gap-1.5">
+            <span>🔍</span> Detective Lenny
+          </span>
+          <div className="px-3.5 py-1 rounded-full bg-[#FFD13B] text-[#2D241E] text-xs font-extrabold shadow-xs">
+            {questionData.level === 'Find it'
+              ? 'Find it · 사실 확인'
+              : questionData.level === 'Why?'
+              ? 'Why? · 이유 추론'
+              : 'Your idea · 내 생각'}
           </div>
-          <span className="font-extrabold text-sm text-[#2D241E]">Lenny's Question</span>
         </div>
-        <div className="px-3.5 py-1 rounded-full bg-[#FFD13B] text-[#2D241E] text-xs font-extrabold shadow-xs">
-          {questionData.level === 'Find it'
-            ? 'Find it · 사실 확인'
-            : questionData.level === 'Why?'
-            ? 'Why? · 이유 추론'
-            : 'Your idea · 내 생각'}
-        </div>
+        <LennyGuide
+          mood={lennyMood}
+          speechText={lennyMessage}
+          subText={lennySubText}
+          onSpeak={() => onSpeakText(lennyMessage)}
+          size="md"
+        />
       </div>
 
       {/* Question in a white card in big bold text */}
@@ -239,17 +279,6 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
         <h2 className="text-xl sm:text-2xl font-extrabold text-[#2D241E] leading-snug">
           {questionData.questionText}
         </h2>
-
-        {/* Clue Hint Box (Shown on wrong try - no red!) */}
-        {showClueHint && !isAnswerRevealed && (
-          <div className="bg-[#FCE9DA] p-3 rounded-[18px] flex items-start gap-2 shadow-xs animate-in fade-in">
-            <Lightbulb className="w-5 h-5 text-[#8A4B14] shrink-0 mt-0.5" />
-            <div className="text-sm text-[#2D241E] font-medium">
-              <span className="font-extrabold text-[#8A4B14] block">Lenny's Clue Hint:</span>
-              {questionData.hintText}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Answer options as big rounded white cards side by side */}
@@ -295,35 +324,29 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
         </div>
       </div>
 
-      {/* Success feedback in a peach card with a green round smile icon and the expanded sentence */}
+      {/* Practice Saying the Sentence Card (Merged with Clue Found feedback) */}
       {isAnswerRevealed && (
-        <div className="bg-[#FCE9DA] rounded-[24px] p-3.5 shadow-xs space-y-2 animate-in fade-in">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-[#4CAF50] text-white flex items-center justify-center text-sm font-bold shadow-xs">
-              😊
+        <div className="bg-white rounded-[24px] p-4 shadow-sm space-y-3 animate-in slide-in-from-bottom-2">
+          {/* Green pill badge at top */}
+          <div className="flex items-center justify-between">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#4CAF50]/15 text-[#4CAF50] border border-[#4CAF50]/30 text-xs font-extrabold shadow-2xs">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>{isOpinionQuestion ? "Great detective idea!" : "Clue found!"}</span>
             </div>
-            <span className="text-xs font-extrabold uppercase tracking-wider text-[#8A4B14]">
-              {isOpinionQuestion ? "Great detective idea!" : "Clue found!"}
-            </span>
           </div>
 
-          <div className="p-3 bg-white/95 rounded-[18px] shadow-2xs">
-            <p className="text-base sm:text-lg font-extrabold text-[#2D241E] leading-snug">
+          {/* Sentence Display: small label, big bold 18px English sentence, 16px brown Korean */}
+          <div className="space-y-1">
+            <span className="text-xs font-extrabold uppercase tracking-wide text-[#2D241E]/70 block">
+              Say this sentence:
+            </span>
+            <p className="text-[18px] font-extrabold text-[#2D241E] leading-snug">
               "{activeExpansion}"
             </p>
-            <p className="text-xs sm:text-sm font-semibold text-[#8A4B14] mt-1">
+            <p className="text-[16px] font-bold text-[#8A4B14] leading-snug">
               {activeKoreanExpansion}
             </p>
           </div>
-        </div>
-      )}
-
-      {/* "Practice saying the sentence:" card with yellow pill [🎤 Say it] and beige pill [▶ Hear me] side by side */}
-      {isAnswerRevealed && (
-        <div className="bg-white rounded-[24px] p-3.5 shadow-sm space-y-3 animate-in slide-in-from-bottom-2">
-          <span className="text-xs sm:text-sm font-extrabold text-[#2D241E] uppercase tracking-wide block">
-            Practice saying the sentence:
-          </span>
 
           {/* Microphone Help for Kids (shown before the very first recording in the app) */}
           {!hasRecordedSuccessfully && !hasRecording && (
@@ -472,30 +495,30 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
         </div>
       )}
 
-      {/* Bottom Next Action: Full-width orange pill [Next ▶] */}
-      <div className="pt-0.5 pb-0.5">
+      {/* Bottom Next Action: Full-width orange pill [Next ▶] or instructional locked button */}
+      <div className="pt-0.5 pb-0.5 text-center">
         <button
           type="button"
           onClick={handleNext}
           disabled={!canProceed}
-          className={`w-full min-h-[48px] rounded-full font-extrabold text-base flex items-center justify-center gap-2 transition-all cursor-pointer ${
+          className={`w-full min-h-[48px] rounded-full font-extrabold text-base flex items-center justify-center gap-2 transition-all ${
             canProceed
-              ? 'bg-[#FF9436] hover:bg-[#F58625] text-white btn-3d-orange'
-              : 'bg-[#E5D7CC] text-[#8C7A6D] cursor-not-allowed'
+              ? 'bg-[#FF9436] hover:bg-[#F58625] text-white btn-3d-orange cursor-pointer'
+              : 'bg-[#E5D7CC] text-[#8C7A6D] cursor-not-allowed shadow-none'
           }`}
         >
-          <span>
-            {!isAnswerRevealed
-              ? 'Answer the question'
-              : !hasRecording && !isMicUnavailable && !hasPracticedWithoutMic
-              ? 'Record your voice 🎤'
-              : hasRecording && !hasPlayedAudioOnce && !isMicUnavailable && !hasPracticedWithoutMic
-              ? 'Listen to your voice 🎧'
-              : 'Next Clue ▶'}
-          </span>
+          <span>{bottomButtonState.text}</span>
           {canProceed && <ArrowRight className="w-5 h-5" />}
         </button>
+
+        {/* Small Korean line under locked button (14px, brown). Hidden when unlocked. */}
+        {!canProceed && bottomButtonState.korean && (
+          <p className="text-[14px] text-[#8A4B14] font-bold text-center mt-1.5 leading-snug">
+            {bottomButtonState.korean}
+          </p>
+        )}
       </div>
     </div>
   );
 };
+
