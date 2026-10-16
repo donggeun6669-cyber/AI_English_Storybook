@@ -6,12 +6,47 @@ export interface UseSpeechSynthesisOptions {
   isSlow?: boolean;
 }
 
+let cachedEnglishVoice: SpeechSynthesisVoice | null = null;
+
+function pickEnglishVoice(): SpeechSynthesisVoice | null {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return null;
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices || voices.length === 0) return null;
+  const englishVoice =
+    voices.find(
+      (v) =>
+        v.lang.startsWith('en') &&
+        (v.name.includes('Google') ||
+          v.name.includes('Samantha') ||
+          v.name.includes('Natural') ||
+          v.name.includes('US'))
+    ) || voices.find((v) => v.lang.startsWith('en'));
+  if (englishVoice) {
+    cachedEnglishVoice = englishVoice;
+  }
+  return englishVoice || null;
+}
+
 export function useSpeechSynthesis() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [currentWordIndex, setCurrentWordIndex] = useState<number | null>(null);
   const [isSlowSpeed, setIsSlowSpeed] = useState(false);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const fallbackTimerRef = useRef<number | null>(null);
+
+  // Listen for voices changed and cache voice reliably
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      pickEnglishVoice();
+      const handleVoicesChanged = () => {
+        pickEnglishVoice();
+      };
+      window.speechSynthesis.addEventListener('voiceschanged', handleVoicesChanged);
+      return () => {
+        window.speechSynthesis.removeEventListener('voiceschanged', handleVoicesChanged);
+      };
+    }
+  }, []);
 
   // Stop any active speech
   const stop = useCallback(() => {
@@ -54,12 +89,8 @@ export function useSpeechSynthesis() {
       utterance.rate = rate;
       utterance.lang = 'en-US';
 
-      // Pick an English voice if available
-      const voices = window.speechSynthesis.getVoices();
-      const englishVoice = voices.find(
-        (v) => v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Natural') || v.name.includes('US'))
-      ) || voices.find((v) => v.lang.startsWith('en'));
-
+      // Pick cached English voice if available
+      const englishVoice = cachedEnglishVoice || pickEnglishVoice();
       if (englishVoice) {
         utterance.voice = englishVoice;
       }
@@ -94,7 +125,7 @@ export function useSpeechSynthesis() {
         setCurrentWordIndex(0);
 
         // Fallback ticker if browser boundary is quiet
-        let approxDurationPerWordMs = Math.max(260, (60000 / (130 * rate)));
+        let approxDurationPerWordMs = Math.max(260, 60000 / (130 * rate));
         let tickWord = 0;
         fallbackTimerRef.current = window.setInterval(() => {
           if (!boundaryFired && tickWord < words.length - 1) {
@@ -112,9 +143,15 @@ export function useSpeechSynthesis() {
         }
         if (event.name === 'word' || typeof event.charIndex === 'number') {
           const charIdx = event.charIndex;
-          const match = charIndexMap.find(
-            (item) => charIdx >= item.start && charIdx <= item.end + 1
+          let match = charIndexMap.find(
+            (item) => charIdx >= item.start && charIdx < item.end
           );
+          if (!match) {
+            const candidates = charIndexMap.filter((item) => item.start <= charIdx);
+            if (candidates.length > 0) {
+              match = candidates[candidates.length - 1];
+            }
+          }
           if (match) {
             setCurrentWordIndex(match.index);
           }

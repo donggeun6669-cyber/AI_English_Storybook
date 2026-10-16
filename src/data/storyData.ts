@@ -50,7 +50,8 @@ export const STORY_PAGES: StoryPageData[] = [
       emoji: "📦",
       simpleDefinition: "Nothing is inside the box."
     },
-    clueSummary: "The box on the desk is open and empty."
+    clueSummary: "The box on the desk is open and empty.",
+    clueSpot: { x: 40, y: 60, word: "an open, empty box" }
   },
   {
     id: 3,
@@ -74,7 +75,8 @@ export const STORY_PAGES: StoryPageData[] = [
       emoji: "🪶",
       simpleDefinition: "Soft parts covering a bird's wings."
     },
-    clueSummary: "Black and white feathers were left on the window sill."
+    clueSummary: "Black and white feathers were left on the window sill.",
+    clueSpot: { x: 30, y: 72, word: "black-and-white feathers" }
   },
   {
     id: 4,
@@ -100,7 +102,8 @@ export const STORY_PAGES: StoryPageData[] = [
       emoji: "🍃",
       simpleDefinition: "A soft and gentle wind."
     },
-    clueSummary: "The window was open, letting in the breeze."
+    clueSummary: "The window was open, letting in the breeze.",
+    clueSpot: { x: 32, y: 35, word: "an open window" }
   },
 
   // Chapter 2: Searching for Clues (Pages 5-8)
@@ -128,7 +131,8 @@ export const STORY_PAGES: StoryPageData[] = [
       emoji: "🐶",
       simpleDefinition: "To think someone did something wrong."
     },
-    clueSummary: "Minji checks if Max took the toy."
+    clueSummary: "Minji checks if Max took the toy.",
+    clueSpot: { x: 32, y: 65, word: "Max has a stick, not Tigi" }
   },
   {
     id: 6,
@@ -152,7 +156,8 @@ export const STORY_PAGES: StoryPageData[] = [
       emoji: "🐾",
       simpleDefinition: "Marks made by feet on the ground."
     },
-    clueSummary: "Tiny bird footprints in the mud prove Max is innocent."
+    clueSummary: "Tiny bird footprints in the mud prove Max is innocent.",
+    clueSpot: { x: 45, y: 88, word: "tiny bird footprints" }
   },
   {
     id: 7,
@@ -176,7 +181,8 @@ export const STORY_PAGES: StoryPageData[] = [
       emoji: "✨",
       simpleDefinition: "Bright and gleaming in the light."
     },
-    clueSummary: "A shiny button from Tigi's shirt was found under the tree."
+    clueSummary: "A shiny button from Tigi's shirt was found under the tree.",
+    clueSpot: { x: 59, y: 83, word: "a shiny yellow button" }
   },
   {
     id: 8,
@@ -200,7 +206,8 @@ export const STORY_PAGES: StoryPageData[] = [
       emoji: "🌿",
       simpleDefinition: "A wooden arm growing from a tree trunk."
     },
-    clueSummary: "A bird is calling from a tree branch."
+    clueSummary: "A bird is calling from a tree branch.",
+    clueSpot: { x: 60, y: 20, word: "a bird on the branch" }
   },
 
   // Chapter 3: The Secret in the Tree (Pages 9-12)
@@ -226,7 +233,8 @@ export const STORY_PAGES: StoryPageData[] = [
       emoji: "🐦",
       simpleDefinition: "A smart black-and-white bird that loves shiny objects."
     },
-    clueSummary: "A magpie is perched in the tree."
+    clueSummary: "A magpie is perched in the tree.",
+    clueSpot: { x: 33, y: 40, word: "a black-and-white magpie" }
   },
   {
     id: 10,
@@ -250,7 +258,8 @@ export const STORY_PAGES: StoryPageData[] = [
       emoji: "🪺",
       simpleDefinition: "A home built by birds out of twigs."
     },
-    clueSummary: "Tigi the tiger doll is safe inside the magpie's nest."
+    clueSummary: "Tigi the tiger doll is safe inside the magpie's nest.",
+    clueSpot: { x: 62, y: 30, word: "Tigi in the nest" }
   },
   {
     id: 11,
@@ -274,7 +283,8 @@ export const STORY_PAGES: StoryPageData[] = [
       emoji: "🤲",
       simpleDefinition: "Carefully and softly without hurting anything."
     },
-    clueSummary: "Teacher Kim gently brings Tigi down safely."
+    clueSummary: "Teacher Kim gently brings Tigi down safely.",
+    clueSpot: { x: 57, y: 36, word: "a long stick" }
   },
   {
     id: 12,

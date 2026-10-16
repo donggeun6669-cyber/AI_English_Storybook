@@ -41,6 +41,11 @@ export const StoryPageScreen: React.FC<StoryPageScreenProps> = ({
   const [hasCompletedAudioOnce, setHasCompletedAudioOnce] = useState(false);
   const autoPlayTriggeredRef = useRef(false);
 
+  // Clue Hotspot state
+  const [showHotspot, setShowHotspot] = useState(false);
+  const [showHotspotLabel, setShowHotspotLabel] = useState(false);
+  const labelTimerRef = useRef<number | null>(null);
+
   // Flatten all words across sentences for unified speech highlighting
   const fullText = useMemo(() => pageData.sentences.join(' '), [pageData.sentences]);
   const wordTokens = useMemo(() => fullText.split(/\s+/).filter(Boolean), [fullText]);
@@ -54,7 +59,43 @@ export const StoryPageScreen: React.FC<StoryPageScreenProps> = ({
     setActiveWordPopup(null);
     setHasCompletedAudioOnce(false);
     autoPlayTriggeredRef.current = false;
+    setShowHotspot(false);
+    setShowHotspotLabel(false);
+    if (labelTimerRef.current) {
+      window.clearTimeout(labelTimerRef.current);
+      labelTimerRef.current = null;
+    }
   }, [pageData.id]);
+
+  // Hotspot appearance behavior:
+  // Appears after page has been read aloud once (or in Ch.3 after 3 seconds or listen once)
+  useEffect(() => {
+    if (pageData.chapter === 3) {
+      const timer = window.setTimeout(() => {
+        setShowHotspot(true);
+      }, 3000);
+      return () => window.clearTimeout(timer);
+    }
+  }, [pageData.id, pageData.chapter]);
+
+  useEffect(() => {
+    if (hasCompletedAudioOnce) {
+      setShowHotspot(true);
+    }
+  }, [hasCompletedAudioOnce]);
+
+  const handleHotspotClick = () => {
+    if (!pageData.clueSpot) return;
+    speakText(pageData.clueSpot.word);
+    setShowHotspotLabel(true);
+    if (labelTimerRef.current) {
+      window.clearTimeout(labelTimerRef.current);
+    }
+    labelTimerRef.current = window.setTimeout(() => {
+      setShowHotspotLabel(false);
+      labelTimerRef.current = null;
+    }, 3000);
+  };
 
   // Fading help audio auto-play logic:
   // Chapter 1: audio auto-plays with word highlighting
@@ -118,19 +159,6 @@ export const StoryPageScreen: React.FC<StoryPageScreenProps> = ({
     return true;
   }, [pageData.chapter, hasCompletedAudioOnce]);
 
-  // Help meter icons: Ch.1 -> 🔍🔍🔍, Ch.2 -> 🔍🔍, Ch.3 -> 🔍
-  const renderHelpMeter = () => {
-    const count = pageData.chapter === 1 ? 3 : pageData.chapter === 2 ? 2 : 1;
-    return (
-      <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-[#FCE9DA] text-[#2D241E] text-xs font-extrabold shadow-xs">
-        <span className="mr-0.5 uppercase tracking-wider text-[#8A4B14]">Help</span>
-        {Array.from({ length: count }).map((_, i) => (
-          <span key={i} className="text-sm">🔍</span>
-        ))}
-      </div>
-    );
-  };
-
   // Example sentence on this page containing the active tapped word
   const exampleSentenceForPopup = useMemo(() => {
     if (!activeWordPopup) return undefined;
@@ -144,38 +172,54 @@ export const StoryPageScreen: React.FC<StoryPageScreenProps> = ({
 
   return (
     <div className="flex flex-col h-full min-h-[580px] justify-between p-3.5 space-y-3 text-[#2D241E]">
-      {/* Top Header Bar: "Ch.1 · Page 3 / 12" peach pill on left, 🔍 help meter pill on right */}
+      {/* Top Header Bar */}
       <div className="flex items-center justify-between">
         <div className="px-3.5 py-1.5 rounded-full bg-[#FCE9DA] text-[#2D241E] text-xs sm:text-sm font-extrabold shadow-xs">
           Ch.{pageData.chapter} · Page {pageData.pageNumber} / {totalPages}
         </div>
-        <div>{renderHelpMeter()}</div>
       </div>
 
-      {/* Large Rounded Illustration */}
+      {/* Large Rounded Illustration with Clue Hotspot */}
       <div className="bg-white rounded-[24px] p-2 shadow-xs overflow-hidden">
-        <StoryIllustration sceneId={pageData.sceneId} />
+        <StoryIllustration sceneId={pageData.sceneId}>
+          {pageData.clueSpot && showHotspot && (
+            <div
+              className="absolute z-20"
+              style={{
+                left: `${pageData.clueSpot.x}%`,
+                top: `${pageData.clueSpot.y}%`,
+                transform: 'translate(-50%, -50%)'
+              }}
+            >
+              {/* Hotspot: 44px round yellow button with 🔍, soft pulse, white border, shadow */}
+              <button
+                type="button"
+                onClick={handleHotspotClick}
+                className="w-[44px] h-[44px] rounded-full bg-[#FFD13B] hover:bg-[#F6C62C] border-2 border-white shadow-md flex items-center justify-center text-lg animate-pulse transition active:scale-90 cursor-pointer"
+                title={pageData.clueSpot.word}
+                aria-label={`Clue hotspot: ${pageData.clueSpot.word}`}
+              >
+                🔍
+              </button>
+
+              {/* Small white pill label with word next to spot for 3 seconds */}
+              {showHotspotLabel && (
+                <div
+                  className={`absolute top-1/2 -translate-y-1/2 whitespace-nowrap bg-white text-[#2D241E] font-extrabold text-xs px-2.5 py-1 rounded-full shadow-md border border-[#FCE9DA] z-30 animate-in fade-in zoom-in-95 pointer-events-none ${
+                    pageData.clueSpot.x > 60 ? 'right-full mr-2' : 'left-full ml-2'
+                  }`}
+                >
+                  {pageData.clueSpot.word}
+                </div>
+              )}
+            </div>
+          )}
+        </StoryIllustration>
       </div>
 
-      {/* Sentences in a white rounded card directly under picture with small round speaker icon on left */}
+      {/* Sentences in a white rounded card directly under picture */}
       <div className="flex-1 bg-white rounded-[24px] p-4 shadow-sm flex flex-col justify-between min-h-[170px]">
-        <div className="flex items-start gap-3">
-          {/* Small round speaker icon on the left */}
-          <button
-            type="button"
-            onClick={handlePlayAudio}
-            className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition shadow-xs cursor-pointer ${
-              isSpeaking
-                ? 'bg-[#8A4B14] text-white ring-2 ring-[#FF9436]'
-                : 'bg-[#FCE9DA] hover:bg-[#F5DAC4] text-[#8A4B14]'
-            }`}
-            title="Read story aloud"
-            aria-label="Read story aloud"
-          >
-            {isSpeaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-          </button>
-
-          <div className="space-y-2 flex-1">
+        <div className="space-y-2 flex-1">
             {pageData.sentences.map((sentence, sIdx) => {
               const rawTokens = sentence.split(' ');
               return (
@@ -231,7 +275,6 @@ export const StoryPageScreen: React.FC<StoryPageScreenProps> = ({
               );
             })}
           </div>
-        </div>
 
         {/* Korean Translation Box (when toggled) in a soft peach card */}
         {showKo && (

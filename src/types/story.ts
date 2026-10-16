@@ -7,6 +7,12 @@ export interface NewWordInfo {
   simpleDefinition: string;
 }
 
+export interface ClueSpot {
+  x: number;
+  y: number;
+  word: string;
+}
+
 export interface StoryPageData {
   id: number;
   chapter: ChapterNumber;
@@ -17,6 +23,7 @@ export interface StoryPageData {
   newWord?: NewWordInfo;
   clueSummary?: string;
   sceneId: string;
+  clueSpot?: ClueSpot;
 }
 
 export type QuestionLevel = 'Find it' | 'Why?' | 'Your idea';

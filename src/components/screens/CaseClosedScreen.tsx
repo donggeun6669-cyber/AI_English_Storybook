@@ -562,9 +562,6 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
             <h3 className="text-2xl font-extrabold text-[#2D241E] mt-0.5">
               Case closed!
             </h3>
-            <p className="text-xs font-bold text-[#8A4B14] mt-0.5">
-              Grade 5–6 Mystery Solver
-            </p>
           </div>
 
           {/* Your guess / Answer row */}
@@ -604,21 +601,21 @@ export const CaseClosedScreen: React.FC<CaseClosedScreenProps> = ({
             </div>
           </div>
 
-          {/* Word taps as three small rounded boxes Ch.1 → Ch.2 → Ch.3 */}
-          <div className="space-y-1.5 text-left">
-            <span className="text-xs font-extrabold text-[#8A4B14] uppercase">Word taps</span>
-            <div className="grid grid-cols-3 gap-2">
-              <div className="bg-[#FDF3EA] rounded-[16px] p-2.5 text-center">
-                <span className="text-[11px] font-bold text-[#8A4B14] block">Ch.1</span>
-                <span className="text-sm font-extrabold text-[#2D241E]">{wordTapsByChapter[1]}</span>
+          {/* Word taps as three small rounded boxes Ch.1 → Ch.2 → Ch.3 (smaller boxes, 14px label) */}
+          <div className="space-y-1 text-left">
+            <span className="text-[14px] font-extrabold text-[#8A4B14] uppercase">Word taps</span>
+            <div className="grid grid-cols-3 gap-1.5">
+              <div className="bg-[#FDF3EA] rounded-[12px] p-1.5 text-center">
+                <span className="text-[10px] font-bold text-[#8A4B14] block">Ch.1</span>
+                <span className="text-xs font-extrabold text-[#2D241E]">{wordTapsByChapter[1]}</span>
               </div>
-              <div className="bg-[#FDF3EA] rounded-[16px] p-2.5 text-center">
-                <span className="text-[11px] font-bold text-[#8A4B14] block">Ch.2</span>
-                <span className="text-sm font-extrabold text-[#2D241E]">{wordTapsByChapter[2]}</span>
+              <div className="bg-[#FDF3EA] rounded-[12px] p-1.5 text-center">
+                <span className="text-[10px] font-bold text-[#8A4B14] block">Ch.2</span>
+                <span className="text-xs font-extrabold text-[#2D241E]">{wordTapsByChapter[2]}</span>
               </div>
-              <div className="bg-[#FDF3EA] rounded-[16px] p-2.5 text-center">
-                <span className="text-[11px] font-bold text-[#8A4B14] block">Ch.3</span>
-                <span className="text-sm font-extrabold text-[#2D241E]">{wordTapsByChapter[3]}</span>
+              <div className="bg-[#FDF3EA] rounded-[12px] p-1.5 text-center">
+                <span className="text-[10px] font-bold text-[#8A4B14] block">Ch.3</span>
+                <span className="text-xs font-extrabold text-[#2D241E]">{wordTapsByChapter[3]}</span>
               </div>
             </div>
           </div>

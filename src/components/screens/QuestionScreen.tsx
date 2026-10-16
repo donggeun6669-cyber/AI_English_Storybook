@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { QuestionData, QuestionOption } from '../../types/story';
+import { STORY_PAGES } from '../../data/storyData';
 import { LennyGuide, LennyMood } from '../LennyGuide';
 import { StoryIllustration } from '../illustrations/StoryIllustration';
 import { useAudioRecorder } from '../speech/useAudioRecorder';
 import { useSpeechRecognition } from '../speech/useSpeechRecognition';
-import { Check, Mic, MicOff, Play, RotateCcw, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Check, MicOff, Play, RotateCcw, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 interface QuestionScreenProps {
   questionData: QuestionData;
@@ -73,6 +74,8 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
   } = useSpeechRecognition();
 
   const isOpinionQuestion = questionData.level === 'Your idea';
+  const pageClueSpot = STORY_PAGES.find((p) => p.pageNumber === pageNumber)?.clueSpot;
+  const isFirstWrongAnswerEnlarged = showClueHint && !isAnswerRevealed;
 
   // Mark successful recording in global state
   useEffect(() => {
@@ -163,7 +166,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
         setLennyMood('thinking');
         setLennyMessage("Hmm, look again!");
         setLennySubText(`Hint: ${questionData.hintText}`);
-        onSpeakText("Hmm, look again!");
+        onSpeakText(`Hmm, look again! ${questionData.hintText}`);
       } else {
         // Second miss: gently reveal the answer
         setIsAnswerRevealed(true);
@@ -232,32 +235,19 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
   const bottomButtonState = getBottomButtonState();
 
   return (
-    <div className="flex flex-col h-full min-h-[580px] justify-between p-3.5 space-y-3 overflow-y-auto text-[#2D241E]">
-      {/* Small scene card at top (rounded thumbnail of the page illustration + one line) */}
-      <div className="bg-white rounded-[20px] p-2 shadow-xs flex items-center gap-3 overflow-hidden">
-        <div className="w-20 h-16 shrink-0 rounded-[14px] overflow-hidden bg-[#FDF3EA] border border-[#FCE9DA]">
-          <StoryIllustration
-            sceneId={`scene-${pageNumber}`}
-            highlightClue={showClueHint}
-          />
-        </div>
-        <div className="flex-1 min-w-0">
-          <span className="text-xs font-extrabold uppercase tracking-wider text-[#8A4B14] block">
-            Page {pageNumber} · Clue Scene
-          </span>
-          <span className="text-xs font-semibold text-[#2D241E]/70 line-clamp-1">
-            Ch.{questionData.chapter} · Clue Check #{pageNumber} / {totalPages}
-          </span>
-        </div>
-      </div>
+    <div className="flex flex-col h-full min-h-[580px] justify-start p-3.5 space-y-2.5 overflow-y-auto text-[#2D241E]">
+      {/* Scene Thumbnail / Enlarge on First Wrong Answer */}
+      {!isFirstWrongAnswerEnlarged ? (
+        <div className="flex items-center justify-between">
+          <div className="relative w-20 h-16 shrink-0 rounded-[14px] overflow-hidden bg-[#FDF3EA] border border-[#FCE9DA] shadow-xs">
+            <StoryIllustration sceneId={`scene-${pageNumber}`} />
+            <div className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded-full bg-black/60 text-white text-[10px] font-bold leading-none select-none">
+              {pageNumber} / {totalPages}
+            </div>
+          </div>
 
-      {/* Lenny Guide with Lenny's round face image + speech bubble, placed under scene card and above question card */}
-      <div className="space-y-1.5">
-        <div className="flex items-center justify-between px-1">
-          <span className="text-xs font-extrabold uppercase tracking-wider text-[#8A4B14] flex items-center gap-1.5">
-            <span>🔍</span> Detective Lenny
-          </span>
-          <div className="px-3.5 py-1 rounded-full bg-[#FFD13B] text-[#2D241E] text-xs font-extrabold shadow-xs">
+          {/* Yellow level pill */}
+          <div className="px-3.5 py-1.5 rounded-full bg-[#FFD13B] text-[#2D241E] text-xs font-extrabold shadow-xs">
             {questionData.level === 'Find it'
               ? 'Find it · 사실 확인'
               : questionData.level === 'Why?'
@@ -265,17 +255,58 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
               : 'Your idea · 내 생각'}
           </div>
         </div>
-        <LennyGuide
-          mood={lennyMood}
-          speechText={lennyMessage}
-          subText={lennySubText}
-          onSpeak={() => onSpeakText(lennyMessage)}
-          size="md"
-        />
-      </div>
+      ) : (
+        /* Enlarge to full-width 4:3 picture on first wrong answer */
+        <div className="space-y-2 animate-in fade-in zoom-in-95 duration-200">
+          <div className="flex justify-end">
+            <div className="px-3.5 py-1 rounded-full bg-[#FFD13B] text-[#2D241E] text-xs font-extrabold shadow-xs">
+              {questionData.level === 'Find it'
+                ? 'Find it · 사실 확인'
+                : questionData.level === 'Why?'
+                ? 'Why? · 이유 추론'
+                : 'Your idea · 내 생각'}
+            </div>
+          </div>
+          <div className="bg-white rounded-[24px] p-2 shadow-xs overflow-hidden">
+            <div className="relative">
+              <StoryIllustration
+                sceneId={`scene-${pageNumber}`}
+                highlightClue={!pageClueSpot}
+              >
+                {pageClueSpot && (
+                  <div
+                    className="absolute z-20 pointer-events-none"
+                    style={{
+                      left: `${pageClueSpot.x}%`,
+                      top: `${pageClueSpot.y}%`,
+                      transform: 'translate(-50%, -50%)'
+                    }}
+                  >
+                    <div className="w-16 h-16 rounded-full border-4 border-[#FFD13B] bg-[#FFD13B]/20 animate-ping absolute inset-0" />
+                    <div className="w-16 h-16 rounded-full border-4 border-[#FFD13B] bg-[#FFD13B]/30 animate-pulse relative" />
+                  </div>
+                )}
+              </StoryIllustration>
+              <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-black/60 text-white text-[11px] font-extrabold select-none">
+                {pageNumber} / {totalPages}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Lenny Guide with Lenny's round face image + speech bubble */}
+      <LennyGuide
+        mood={lennyMood}
+        speechText={lennyMessage}
+        subText={lennySubText}
+        onSpeak={() => onSpeakText(lennyMessage)}
+        size="md"
+        hideHeader={true}
+      />
 
       {/* Question in a white card in big bold text */}
-      <div className="bg-white rounded-[24px] p-4 shadow-sm space-y-2.5">
+      <div className="bg-white rounded-[24px] p-4 shadow-sm space-y-2">
         <h2 className="text-xl sm:text-2xl font-extrabold text-[#2D241E] leading-snug">
           {questionData.questionText}
         </h2>
@@ -348,8 +379,8 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
             </p>
           </div>
 
-          {/* Microphone Help for Kids (shown before the very first recording in the app) */}
-          {!hasRecordedSuccessfully && !hasRecording && (
+          {/* Microphone Help for Kids (shown before the very first recording in the app, hidden if error box shows) */}
+          {!hasRecordedSuccessfully && !hasRecording && !isMicUnavailable && !micErrorMessage && (
             <div className="p-2.5 bg-[#FCE9DA] rounded-[16px] text-center space-y-0.5 animate-in fade-in">
               <p className="text-xs font-extrabold text-[#2D241E] leading-snug">
                 Your browser may ask to use the microphone. Ask a parent or teacher to tap 'Allow'.
@@ -380,15 +411,14 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
             </div>
           ) : (
             <div className="space-y-2.5">
-              {/* Yellow pill [🎤 Say it] and Beige pill [▶ Hear me] side by side */}
+              {/* Yellow pill [🎤 Say it] and Beige pill [▶ Hear me] side by side with single icon */}
               <div className="flex items-center gap-2">
                 {!isRecording ? (
                   <button
                     type="button"
                     onClick={startRecording}
-                    className="flex-1 min-h-[48px] bg-[#FFD13B] hover:bg-[#f6c62c] text-[#2D241E] font-extrabold text-sm rounded-full flex items-center justify-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer"
+                    className="flex-1 min-h-[48px] bg-[#FFD13B] hover:bg-[#f6c62c] text-[#2D241E] font-extrabold text-sm rounded-full flex items-center justify-center shadow-xs transition active:scale-95 cursor-pointer"
                   >
-                    <Mic className="w-4 h-4 text-[#8A4B14]" />
                     <span>{hasRecording ? '🎤 Say again' : '🎤 Say it'}</span>
                   </button>
                 ) : (
@@ -406,9 +436,8 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
                 <button
                   type="button"
                   onClick={() => onSpeakText(activeExpansion)}
-                  className="flex-1 min-h-[48px] bg-[#FCE9DA] hover:bg-[#F5DAC4] text-[#2D241E] font-extrabold text-sm rounded-full flex items-center justify-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer"
+                  className="flex-1 min-h-[48px] bg-[#FCE9DA] hover:bg-[#F5DAC4] text-[#2D241E] font-extrabold text-sm rounded-full flex items-center justify-center shadow-xs transition active:scale-95 cursor-pointer"
                 >
-                  <Play className="w-4 h-4 fill-current text-[#8A4B14]" />
                   <span>▶ Hear me</span>
                 </button>
 
@@ -455,7 +484,6 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
                       disabled
                       className="w-full min-h-[48px] rounded-full bg-[#4CAF50]/80 text-white font-extrabold text-sm flex items-center justify-center gap-2 animate-pulse"
                     >
-                      <Mic className="w-4 h-4" />
                       <span>Listening... Say the sentence now!</span>
                     </button>
                   )}
@@ -496,7 +524,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
       )}
 
       {/* Bottom Next Action: Full-width orange pill [Next ▶] or instructional locked button */}
-      <div className="pt-0.5 pb-0.5 text-center">
+      <div className="mt-auto pt-2 pb-0.5 text-center">
         <button
           type="button"
           onClick={handleNext}
@@ -521,4 +549,5 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
     </div>
   );
 };
+
 

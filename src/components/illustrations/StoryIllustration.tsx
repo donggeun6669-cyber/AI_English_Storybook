@@ -4,12 +4,14 @@ interface StoryIllustrationProps {
   sceneId: string;
   className?: string;
   highlightClue?: boolean;
+  children?: React.ReactNode;
 }
 
 export const StoryIllustration: React.FC<StoryIllustrationProps> = ({
   sceneId,
   className = '',
-  highlightClue = false
+  highlightClue = false,
+  children
 }) => {
   // Stitch illustrations (Google Stitch, 2026-10-11). Falls back to the SVG scene if a picture is missing.
   const imageSrc =
@@ -32,6 +34,7 @@ export const StoryIllustration: React.FC<StoryIllustrationProps> = ({
           className={`w-full h-full object-cover select-none ${sceneId === 'cover' ? 'object-top' : 'object-center'}`}
           draggable={false}
         />
+        {children}
       </div>
     );
   }
@@ -724,6 +727,7 @@ export const StoryIllustration: React.FC<StoryIllustrationProps> = ({
           </g>
         )}
       </svg>
+      {children}
     </div>
   );
 };

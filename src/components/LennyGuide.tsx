@@ -10,6 +10,7 @@ interface LennyGuideProps {
   onSpeak?: () => void;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  hideHeader?: boolean;
 }
 
 export const LennyGuide: React.FC<LennyGuideProps> = ({
@@ -18,7 +19,8 @@ export const LennyGuide: React.FC<LennyGuideProps> = ({
   subText,
   onSpeak,
   size = 'md',
-  className = ''
+  className = '',
+  hideHeader = false
 }) => {
   const getLennyFace = () => {
     switch (mood) {
@@ -112,10 +114,12 @@ export const LennyGuide: React.FC<LennyGuideProps> = ({
 
           <div className="flex items-start justify-between gap-2">
             <div>
-              <div className="flex items-center gap-1.5 mb-0.5">
-                <span className="font-extrabold text-xs uppercase tracking-wider text-[#8A4B14]">Lenny</span>
-                <span className="text-xs text-[#2D241E]/60 font-semibold">· Detective Guide</span>
-              </div>
+              {!hideHeader && (
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <span className="font-extrabold text-xs uppercase tracking-wider text-[#8A4B14]">Lenny</span>
+                  <span className="text-xs text-[#2D241E]/60 font-semibold">· Detective Guide</span>
+                </div>
+              )}
               <p className="text-base font-extrabold leading-snug text-[#2D241E]">{speechText}</p>
               {subText && <p className="text-xs text-[#2D241E]/70 mt-1 font-bold">{subText}</p>}
             </div>
