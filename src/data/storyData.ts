@@ -318,7 +318,7 @@ export const QUESTIONS_DATA: Record<number, QuestionData> = {
     chapter: 1,
     level: "Find it",
     questionText: "What is missing before Sports Day?",
-    hintText: "Look at the open box.",
+    hintText: "Look at the shelves. Tigi is not there.",
     options: [
       { id: "a", text: "Tigi the tiger mascot", emoji: "🐯", isCorrect: true },
       { id: "b", text: "Teacher Kim", emoji: "👩‍🏫", isCorrect: false }
